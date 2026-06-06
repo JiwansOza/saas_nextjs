@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll);  
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   return (
