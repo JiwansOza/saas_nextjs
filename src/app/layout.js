@@ -1,6 +1,7 @@
 "use client";
 
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { useEffect, useState } from "react";
@@ -41,6 +42,16 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Preta loader — in the ROOT layout so it loads on every route, not just the
+            homepage. (Was previously only in app/page.js, so elements never showed on
+            /features, /pricing, /about-us, etc.) */}
+        <Script
+          async
+          src="https://loader.pretasystems.com/?d=saas-nextjs-flax.vercel.app"
+          data-api="https://app.pretasystems.com/api"
+          data-debug="true"
+          crossOrigin="anonymous"
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

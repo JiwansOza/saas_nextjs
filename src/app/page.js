@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 
-import Script from "next/script";
 import HeroSection from "@/components/HeroSection";
 import LogoSection from "@/components/LogoSection";
 import FeatureSection from "@/components/FeatureSection";
@@ -30,13 +29,6 @@ export default function LandingPage() {
 
   return (
     <>
-      <Script
-        async
-        src="https://loader.pretasystems.com/?d=saas-nextjs-flax.vercel.app"
-        data-api="https://app.pretasystems.com/api"
-        data-debug="true"
-        crossOrigin="anonymous"
-      />
       <main className="flex-1">
         {/* Hero Section */}
         <HeroSection />
