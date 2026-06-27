@@ -45,13 +45,12 @@ export default function RootLayout({ children }) {
         {/* Preta loader — in the ROOT layout so it loads on every route, not just the
             homepage. (Was previously only in app/page.js, so elements never showed on
             /features, /pricing, /about-us, etc.) */}
-        <Script
-          async
-          src="https://loader.pretasystems.com/?d=saas-nextjs-flax.vercel.app"
-          data-api="https://app.pretasystems.com/api"
-          data-debug="true"
-          crossOrigin="anonymous"
-        />
+      <script
+ async
+  src="https://yash-loader-worker.pushkarnagwekar.workers.dev/?d=clothing-factory-zeta.vercel.app"
+  data-api="https://app.pretasystems.com/api"
+  data-debug="true">
+</script>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
