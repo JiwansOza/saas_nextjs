@@ -47,7 +47,8 @@ export default function RootLayout({ children }) {
             /features, /pricing, /about-us, etc.) */}
       <script
  async
-  src="https://yash-loader-worker.pushkarnagwekar.workers.dev/?d=clothing-factory-zeta.vercel.app"
+  src="https://yash-loader-worker.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app
+    "
   data-api="https://app.pretasystems.com/api"
   data-debug="true">
 </script>
