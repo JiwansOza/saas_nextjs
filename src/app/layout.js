@@ -7,59 +7,64 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({ 
+const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-}); 
+});
 
 export default function RootLayout({ children }) {
   const [isScrolled, setIsScrolled] = useState(false);
-
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 10);
     };
-
-    window.addEventListener("scroll", handleScroll);  
+    window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {/* Preta loader — in the ROOT layout so it loads on every route, not just the
-            homepage. (Was previously only in app/page.js, so elements never showed on
-            /features, /pricing, /about-us, etc.) */}
-      <script
- async
-  src="https://yash-loader-worker.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app
-    "
-  data-api="https://app.pretasystems.com/api"
-  data-debug="true">
-</script>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/*
+          Reads the saasify_session cookie and sets window.pretaUser before
+          the personalisation loader runs. In production a real client would
+          do the same — server-render the user's plan data into this script
+          from their session/JWT so the loader can evaluate targeting instantly.
+        */}
+        <Script id="user-context-init" strategy="beforeInteractive">
+          {`
+            (function() {
+              try {
+                var match = document.cookie.match(/(^|;\\s*)saasify_session=([^;]+)/);
+                if (match) {
+                  var session = JSON.parse(decodeURIComponent(match[2]));
+                  window.pretaUser = session.pretaUser || {};
+                } else {
+                  window.pretaUser = {};
+                }
+              } catch(e) {
+                window.pretaUser = {};
+              }
+            })();
+          `}
+        </Script>
 
+        <Script
+          src="https://yash-loader-worker.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
+          data-api="https://app.pretasystems.com/api"
+          data-debug="true"
+          strategy="afterInteractive"
+        />
 
-    // src/app/layout.js mein
-<script dangerouslySetInnerHTML={{
-  __html: `window.pretaUser = {
-    plan: "enterprise",
-    risk_score: 0.8
-  }`
-}} />
-    
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -67,7 +72,6 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <Navbar isScrolled={isScrolled} mounted={mounted} />
-
           {children}
           <Footer />
         </ThemeProvider>
