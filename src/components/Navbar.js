@@ -10,7 +10,6 @@ import { Menu } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
-
 const Navbar = ({ isScrolled, mounted }) => {
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
