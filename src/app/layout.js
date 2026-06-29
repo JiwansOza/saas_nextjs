@@ -17,8 +17,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 }); 
 
-
-
 export default function RootLayout({ children }) {
   const [isScrolled, setIsScrolled] = useState(false);
 
