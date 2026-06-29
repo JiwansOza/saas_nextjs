@@ -52,6 +52,16 @@ export default function RootLayout({ children }) {
   data-api="https://app.pretasystems.com/api"
   data-debug="true">
 </script>
+
+
+    // src/app/layout.js mein
+<script dangerouslySetInnerHTML={{
+  __html: `window.pretaUser = {
+    plan: "enterprise",
+    risk_score: 0.8
+  }`
+}} />
+    
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
