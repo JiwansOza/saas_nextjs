@@ -8,7 +8,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 // Demo users — in a real app this mapping lives on the server (DB / auth provider)
 const DEMO_USERS = {
@@ -26,7 +25,6 @@ function setSessionCookie(userData) {
 }
 
 export default function LoginPage() {
-  const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
 
@@ -56,7 +54,7 @@ export default function LoginPage() {
       },
     });
 
-    router.push("/");
+    window.location.href = "/";
   };
 
   return (
