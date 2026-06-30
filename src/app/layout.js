@@ -24,11 +24,24 @@ export default function RootLayout({ children }) {
 
   useEffect(() => {
     setMounted(true);
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Fetch Preta JWT on every page load (if user is logged in)
+  useEffect(() => {
+    const token = localStorage.getItem("saasify_access_token");
+    if (!token) return;
+
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"}/users/preta-token`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.token) window.__PRETA_CTX__ = data.token;
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -61,6 +74,7 @@ export default function RootLayout({ children }) {
         <Script
           src="https://yash-loader-worker.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
           data-api="https://app.pretasystems.com/api"
+          data-ctx-var="__PRETA_CTX__"
           data-debug="true"
           strategy="afterInteractive"
         />
