@@ -33,30 +33,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/*
-          Reads the saasify_session cookie and sets window.pretaUser before
-          the personalisation loader runs. In production a real client would
-          do the same — server-render the user's plan data into this script
-          from their session/JWT so the loader can evaluate targeting instantly.
-        */}
-        <Script id="user-context-init" strategy="beforeInteractive">
-          {`
-            (function() {
-              try {
-                var match = document.cookie.match(/(^|;\\s*)saasify_session=([^;]+)/);
-                if (match) {
-                  var session = JSON.parse(decodeURIComponent(match[2]));
-                  window.pretaUser = session.pretaUser || {};
-                } else {
-                  window.pretaUser = {};
-                }
-              } catch(e) {
-                window.pretaUser = {};
-              }
-            })();
-          `}
-        </Script>
-
         <Script
           src="https://yash-loader-worker.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
           data-api="https://app.pretasystems.com/api"
