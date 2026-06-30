@@ -60,7 +60,7 @@ export default function RootLayout({ children }) {
 
         <Script
           src="https://yash-loader-worker.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
-          data-api="https://app.pretasystems.com/api"
+          data-api="https://preta-dashboard-phase1.pushkarnagwekar.workers.dev/api"
           data-debug="true"
           strategy="afterInteractive"
         />
