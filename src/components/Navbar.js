@@ -31,10 +31,20 @@ const Navbar = ({ isScrolled, mounted }) => {
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [session, setSession] = useState(null);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
     setSession(getSession());
   }, []);
+
+  useEffect(() => {
+    if (!profileOpen) return;
+    const close = (e) => {
+      if (!e.target.closest("[data-profile]")) setProfileOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [profileOpen]);
 
   const handleLogout = () => {
     clearSession();
@@ -76,25 +86,57 @@ const Navbar = ({ isScrolled, mounted }) => {
           </Button>
 
           {session ? (
-            <div className="flex items-center gap-3">
-              {/* User pill */}
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-muted/50">
+            <div className="relative flex items-center gap-3" data-profile>
+              {/* User pill — click to toggle profile dropdown */}
+              <button
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+              >
                 <span
                   className="size-2 rounded-full flex-shrink-0"
                   style={{ background: PLAN_COLORS[session.plan] || "#6b7280" }}
                 />
                 <span className="text-sm font-medium">{session.name}</span>
                 <span className="text-xs text-muted-foreground">{session.plan}</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleLogout}
-                className="rounded-full cursor-pointer"
-                title="Logout"
-              >
-                <LogOut className="size-4" />
-              </Button>
+              </button>
+
+              {/* Profile dropdown */}
+              {profileOpen && (
+                <div className="absolute right-0 top-10 w-64 rounded-xl border border-border bg-background shadow-lg z-50 overflow-hidden">
+                  {/* Header */}
+                  <div className="px-4 py-3 border-b border-border bg-muted/30">
+                    <p className="text-sm font-semibold">{session.name}</p>
+                    <p className="text-xs text-muted-foreground">{session.email}</p>
+                  </div>
+
+                  {/* Data rows */}
+                  <div className="px-4 py-3 space-y-2">
+                    {[
+                      { label: "Plan",           value: session.plan },
+                      { label: "Role",           value: session.pretaUser?.role || "—" },
+                      { label: "Billing",        value: session.pretaUser?.billing_status || "—" },
+                      { label: "Has Paid",       value: session.pretaUser?.has_paid ? "Yes" : "No" },
+                      { label: "Risk Score",     value: session.pretaUser?.risk_score ?? "—" },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">{label}</span>
+                        <span className="font-medium">{String(value)}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Logout */}
+                  <div className="px-4 py-3 border-t border-border">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 text-sm text-destructive hover:text-destructive/80 transition-colors cursor-pointer"
+                    >
+                      <LogOut className="size-4" />
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <>
