@@ -107,10 +107,8 @@ const BILLING_STATUSES = [
         return;
       }
 
-      // Store access token for future API calls
       localStorage.setItem("saasify_access_token", data.access_token);
 
-      // Set session cookie so Navbar + pretaUser script can read it
       setSessionCookie({
         name:      data.user.name,
         email:     data.user.email,
@@ -119,15 +117,12 @@ const BILLING_STATUSES = [
           id:             data.user._id,
           plan:           data.user.plan,
           role:           data.user.role,
-          user_types:     data.user.user_types,
-          features:       data.user.features,
           has_paid:       data.user.has_paid,
           billing_status: data.user.billing_status,
           risk_score:     data.user.risk_score,
         },
       });
 
-      // Hard reload so layout re-reads the cookie and pretaUser is set fresh
       window.location.href = "/";
     } catch (err) {
       setError("Could not reach server. Make sure the backend is running.");
@@ -344,6 +339,7 @@ const BILLING_STATUSES = [
                 Log in
               </Link>
             </p>
+
           </CardContent>
         </Card>
       </motion.div>
