@@ -6,17 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 
-// Demo users — in a real app this mapping lives on the server (DB / auth provider)
-const DEMO_USERS = {
-  "ansh@saasify.com":      { name: "Ansh",      plan: "Enterprise", userTypes: ["security_admin"] },
-  "hamza@saasify.com":     { name: "Hamza",     plan: "Business",   userTypes: ["marketing_user"] },
-  "jiwans@saasify.com":    { name: "Jiwans",    plan: "Pro",        userTypes: ["Prime"] },
-  "jay@saasify.com":       { name: "Jay",       plan: "Starter",    userTypes: ["normal"] },
-  "priyanshu@saasify.com": { name: "Priyanshu", plan: "Free",       userTypes: [] },
-};
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 function setSessionCookie(userData) {
   const value = encodeURIComponent(JSON.stringify(userData));
@@ -25,36 +18,60 @@ function setSessionCookie(userData) {
 }
 
 export default function LoginPage() {
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+  const [form, setForm]       = useState({ email: "", password: "" });
+  const [error, setError]     = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = form.email.trim().toLowerCase();
-    const user = DEMO_USERS[email];
+    if (!form.email.trim() || !form.password) return setError("Email and password are required");
 
-    if (!user) {
-      setError("No account found. Try: ansh@saasify.com, hamza@saasify.com, jiwans@saasify.com, jay@saasify.com, or priyanshu@saasify.com");
-      return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${BACKEND_URL}/auth/login`, {
+        method:      "POST",
+        headers:     { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email:    form.email.trim().toLowerCase(),
+          password: form.password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Login failed");
+        return;
+      }
+
+      localStorage.setItem("saasify_access_token", data.access_token);
+
+      setSessionCookie({
+        name:      data.user.name,
+        email:     data.user.email,
+        plan:      data.user.plan,
+        pretaUser: {
+          id:             data.user._id,
+          plan:           data.user.plan,
+          role:           data.user.role,
+          has_paid:       data.user.has_paid,
+          billing_status: data.user.billing_status,
+          risk_score:     data.user.risk_score,
+        },
+      });
+
+      window.location.href = "/";
+    } catch {
+      setError("Could not reach server. Make sure the backend is running.");
+    } finally {
+      setLoading(false);
     }
-
-    setSessionCookie({
-      name: user.name,
-      email,
-      plan: user.plan,
-      pretaUser: {
-        userTypes: user.userTypes,
-        plan: user.plan,
-        name: user.name,
-      },
-    });
-
-    window.location.href = "/";
   };
 
   return (
@@ -150,10 +167,17 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
+                disabled={loading}
                 className="w-full mt-4 rounded-full text-base py-5 cursor-pointer bg-primary hover:bg-primary/90 transition-all duration-300 shadow-lg group"
               >
-                Login
-                <ArrowRight className="size-4 group-hover:translate-x-1 transition-all ease-in-out duration-300" />
+                {loading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <>
+                    Login
+                    <ArrowRight className="size-4 group-hover:translate-x-1 transition-all ease-in-out duration-300" />
+                  </>
+                )}
               </Button>
             </form>
 
