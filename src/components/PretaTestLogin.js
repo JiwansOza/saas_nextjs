@@ -4,50 +4,50 @@ import { useState, useEffect } from 'react';
 
 const SEGMENTS = [
   {
-    id: 'security_admin',
-    label: 'Security Admin',
-    userTypes: ['security_admin'],
+    id: 'prime_admin',
+    label: 'Prime Admin',
+    claims: { plan: 'prime', role: 'admin', has_paid: true, billing_status: 'active' },
     color: '#ef4444',
-    description: 'Priority 1 — highest'
+    description: 'prime + admin + paid'
   },
   {
-    id: 'marketing_user',
-    label: 'Marketing',
-    userTypes: ['marketing_user'],
-    color: '#f97316',
-    description: 'Priority 100'
-  },
-  {
-    id: 'Prime',
-    label: 'Premium',
-    userTypes: ['Prime'],
+    id: 'prime_user',
+    label: 'Prime User',
+    claims: { plan: 'prime', role: 'user', has_paid: true, billing_status: 'active' },
     color: '#a855f7',
-    description: 'Priority 200'
+    description: 'prime + paid'
   },
   {
-    id: 'normal',
-    label: 'Normal',
-    userTypes: ['normal'],
+    id: 'basic_user',
+    label: 'Basic User',
+    claims: { plan: 'basic', role: 'user', has_paid: true, billing_status: 'active' },
+    color: '#f97316',
+    description: 'basic + paid'
+  },
+  {
+    id: 'free_user',
+    label: 'Free User',
+    claims: { plan: 'free', role: 'user', has_paid: false, billing_status: 'free' },
     color: '#6b7280',
-    description: 'Priority 500'
+    description: 'free plan'
   },
   {
     id: 'guest',
     label: 'Guest',
-    userTypes: [],
+    claims: {},
     color: '#374151',
-    description: 'No targeting'
+    description: 'no claims'
   },
 ];
 
 const STORAGE_KEY = 'preta_test_user';
 
 const PRESET_USERS = [
-  { name: 'Ansh',      segment: 'security_admin' },
-  { name: 'Hamza',     segment: 'marketing_user' },
-  { name: 'Jiwans',    segment: 'Prime'          },
-  { name: 'Jay',       segment: 'normal'         },
-  { name: 'Priyanshu', segment: 'guest'          },
+  { name: 'Ansh',      segment: 'prime_admin' },
+  { name: 'Hamza',     segment: 'basic_user'  },
+  { name: 'Jiwans',    segment: 'prime_user'  },
+  { name: 'Jay',       segment: 'free_user'   },
+  { name: 'Priyanshu', segment: 'guest'       },
 ];
 
 export default function PretaTestLogin() {
@@ -70,22 +70,25 @@ export default function PretaTestLogin() {
   const handleLogin = () => {
     if (!name.trim()) return;
     const segment = SEGMENTS.find(s => s.id === selectedSegment);
+    const pretaUser = { ...segment.claims, name: name.trim() };
     const user = {
       name: name.trim(),
       segment: segment.id,
       segmentLabel: segment.label,
-      pretaUser: {
-        userTypes: segment.userTypes,
-        name: name.trim(),
-        segment: segment.id,
-      }
+      pretaUser,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    // Set saasify_session cookie so /users/preta-token route can read it
+    document.cookie = `saasify_session=${encodeURIComponent(JSON.stringify({ pretaUser }))}; path=/; SameSite=Lax`;
+    // Set saasify_access_token so loader triggers the ctx-endpoint fetch
+    localStorage.setItem('saasify_access_token', 'test-session-token');
     window.location.reload();
   };
 
   const handleLogout = () => {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('saasify_access_token');
+    document.cookie = 'saasify_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     window.location.reload();
   };
 
@@ -193,7 +196,7 @@ export default function PretaTestLogin() {
                 </div>
                 <div style={{ marginTop: '10px', padding: '8px', background: '#0a0a0a', borderRadius: '8px' }}>
                   <code style={{ fontSize: '10px', color: '#3ffb00', wordBreak: 'break-all' }}>
-                    {JSON.stringify(currentUser.pretaUser)}
+                    JWT claims: {JSON.stringify(currentUser.pretaUser)}
                   </code>
                 </div>
               </div>

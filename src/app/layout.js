@@ -24,43 +24,19 @@ export default function RootLayout({ children }) {
 
   useEffect(() => {
     setMounted(true);
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/*
-          Reads the saasify_session cookie and sets window.pretaUser before
-          the personalisation loader runs. In production a real client would
-          do the same — server-render the user's plan data into this script
-          from their session/JWT so the loader can evaluate targeting instantly.
-        */}
-        <Script id="user-context-init" strategy="beforeInteractive">
-          {`
-            (function() {
-              try {
-                var match = document.cookie.match(/(^|;\\s*)saasify_session=([^;]+)/);
-                if (match) {
-                  var session = JSON.parse(decodeURIComponent(match[2]));
-                  window.pretaUser = session.pretaUser || {};
-                } else {
-                  window.pretaUser = {};
-                }
-              } catch(e) {
-                window.pretaUser = {};
-              }
-            })();
-          `}
-        </Script>
-
         <Script
           src="https://yash-loader-worker.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
           data-api="https://preta-dashboard-phase1.pushkarnagwekar.workers.dev/api"
+          data-ctx-endpoint="/users/preta-token"
           data-debug="true"
           strategy="afterInteractive"
         />
