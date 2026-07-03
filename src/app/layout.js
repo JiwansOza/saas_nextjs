@@ -35,7 +35,7 @@ export default function RootLayout({ children }) {
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Script
           id="preta-loader"
-          src="https://yash-loader-worker.pushkarnagwekar.workers.dev/?d=your-domain.com"
+          src="https://preta-policy-phase1.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
           strategy="afterInteractive"
           data-api="https://preta-dashboard-phase1.pushkarnagwekar.workers.dev/api"
           data-ctx-endpoint="/api/preta-token"
