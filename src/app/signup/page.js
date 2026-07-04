@@ -26,8 +26,8 @@ export default function SignupPage() {
 
   const ROLES = [
     "Developer",
-    "Marketing Manager",
-    "CISO / Security",
+    "Marketing",
+    "Security",
   ];
 
 const BILLING_STATUSES = [
