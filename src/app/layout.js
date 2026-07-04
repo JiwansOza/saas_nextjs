@@ -1,7 +1,6 @@
 "use client";
 
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { useEffect, useState } from "react";
@@ -30,21 +29,19 @@ export default function RootLayout({ children }) {
   }, []);
 
 
-  const antiFlickerSnippet = `(function(){document.documentElement.style.opacity='0';var t=setTimeout(function(){document.documentElement.style.opacity='';},2000);window.__preta_af_clear=function(){clearTimeout(t);document.documentElement.style.transition='opacity 0.15s';document.documentElement.style.opacity='1';setTimeout(function(){document.documentElement.style.transition='';document.documentElement.style.opacity='';},200);};})();`;
-
   return (
     <html lang="en">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: antiFlickerSnippet }} />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Script
-          id="preta-loader"
+        {/* Sync (no async/defer) so loader runs before first paint.
+            The loader's installGlobalAntiFlicker() sets opacity:0 immediately
+            and revealPage() fades in after elements are applied — no snippet needed. */}
+        <script
           src="https://preta-policy-phase1.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
-          strategy="beforeInteractive"
           data-api="https://preta-dashboard-phase1.pushkarnagwekar.workers.dev/api"
           data-ctx-endpoint="/api/preta-token"
         />
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 
         {/* Standard Next.js app-shell wrapper. App Router doesn't emit the
             #__next node that Pages Router does, but the Preta loader looks for
