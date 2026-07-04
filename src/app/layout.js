@@ -32,9 +32,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        {/* Sync (no async/defer) so loader runs before first paint.
-            The loader's installGlobalAntiFlicker() sets opacity:0 immediately
-            and revealPage() fades in after elements are applied — no snippet needed. */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
           src="https://preta-policy-phase1.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
           data-api="https://preta-dashboard-phase1.pushkarnagwekar.workers.dev/api"
