@@ -29,15 +29,12 @@ export default function RootLayout({ children }) {
   }, []);
 
 
-  const afSnippet = `(function(){document.documentElement.style.opacity='0';var t=setTimeout(function(){document.documentElement.style.opacity='';},2000);window.__preta_af_clear=function(){clearTimeout(t);document.documentElement.style.transition='opacity 0.15s';document.documentElement.style.opacity='1';setTimeout(function(){document.documentElement.style.transition='';document.documentElement.style.opacity='';},200);};})();`;
-
   return (
     <html lang="en">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: afSnippet }} />
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
-          async
-          src="https://preta-policy-phase1.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
+          src="https://preta-policy-phase1.pushkarnagwekar.workers.dev/boot?d=saas-nextjs-flax.vercel.app"
           data-api="https://preta-dashboard-phase1.pushkarnagwekar.workers.dev/api"
           data-ctx-endpoint="/api/preta-token"
         />
