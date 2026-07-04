@@ -54,6 +54,10 @@ const Navbar = ({ isScrolled, mounted }) => {
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
+    // Reload so the page fully re-renders with the newly selected mode.
+    // next-themes persists the choice to localStorage synchronously, so the
+    // correct theme is restored immediately after the refresh.
+    window.location.reload();
   };
 
   return (
