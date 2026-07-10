@@ -33,10 +33,13 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        {/* Preta SDK. The loader fetches the signed user-context JWT directly from our
+            backend using the Bearer token in localStorage (saasify_access_token) — no
+            cookies, no frontend route. The private key stays only on the backend. */}
         <script
           src="https://preta-policy-phase1.pushkarnagwekar.workers.dev/boot?d=saas-nextjs-flax.vercel.app"
           data-api="https://preta-dashboard-phase1.pushkarnagwekar.workers.dev/api"
-          data-ctx-endpoint="/api/preta-token"
+          data-ctx-endpoint={`${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"}/users/preta-token`}
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
