@@ -40,6 +40,7 @@ export default function RootLayout({ children }) {
           src="https://preta-policy-phase1.pushkarnagwekar.workers.dev/boot?d=saas-nextjs-flax.vercel.app"
           data-api="https://preta-dashboard-phase1.pushkarnagwekar.workers.dev/api"
           data-ctx-endpoint={`${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"}/users/preta-token`}
+          data-ctx-token-key="saasify_access_token"
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
