@@ -48,6 +48,11 @@ const Navbar = ({ isScrolled, mounted }) => {
 
   const handleLogout = () => {
     clearSession();
+    // Logout must also invalidate the access token — otherwise a logged-out visitor's
+    // token stays valid until it expires, and anything reading it (our own APIs OR the
+    // Preta SDK's ctx-endpoint) keeps treating the user as signed in. Clearing it makes
+    // /users/preta-token return 401 → the personalized element is removed.
+    try { localStorage.removeItem("saasify_access_token"); } catch (e) {}
     setSession(null);
     window.location.href = "/";
   };
