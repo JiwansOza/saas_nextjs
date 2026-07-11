@@ -1,6 +1,7 @@
 "use client";
 
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { useEffect, useState } from "react";
@@ -31,15 +32,21 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <head>
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* OLD loader (kept for reference — hidden, do not remove):
         <script
           src="https://preta-policy-phase1.pushkarnagwekar.workers.dev/boot?d=saas-nextjs-flax.vercel.app"
           data-api="https://preta-dashboard-phase1.pushkarnagwekar.workers.dev/api"
           data-ctx-endpoint="/api/preta-token"
         />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        */}
+        <Script
+          id="preta-loader"
+          src="https://loader.pretasystems.com/?d=saas-nextjs-flax.vercel.app"
+          strategy="afterInteractive"
+          data-api="https://app.pretasystems.com/api"
+          data-debug="true"
+        />
 
         {/* Standard Next.js app-shell wrapper. App Router doesn't emit the
             #__next node that Pages Router does, but the Preta loader looks for
