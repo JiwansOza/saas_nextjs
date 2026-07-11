@@ -43,7 +43,7 @@ export default function RootLayout({ children }) {
         */}
         <Script
           id="preta-loader"
-          src="https://loader.pretasystems.com/?d=saas-nextjs-flax.vercel.app"
+          src="https://audiance-loader-worker.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
           strategy="afterInteractive"
           data-api="https://app.pretasystems.com/api"
           data-debug="true"
