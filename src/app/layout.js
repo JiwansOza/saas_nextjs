@@ -41,14 +41,13 @@ export default function RootLayout({ children }) {
           data-ctx-token-key="saasify_access_token"
         />
         */}
-   <!-- Preta SmartCode Start -->
+   
 <script
   async
   src="https://loader.pretasystems.com/?d=saas-nextjs-flax.vercel.app"
   data-api="https://app.pretasystems.com/api"
   data-debug="true">
 </script>
-<!-- Preta SmartCode End -->
 
         {/* Standard Next.js app-shell wrapper. App Router doesn't emit the
             #__next node that Pages Router does, but the Preta loader looks for
