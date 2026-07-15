@@ -41,12 +41,13 @@ export default function RootLayout({ children }) {
           data-ctx-token-key="saasify_access_token"
         />
         */}
-        <Script
-          src="https://hamza-phase-1.pushkarnagwekar.workers.dev/boot?d=saas-nextjs-flax.vercel.app/"
-          data-api="https://preta-dashboardphasev1-1.pushkarnagwekar.workers.dev/api"
-          data-ctx-endpoint="/api/preta-token"
-          strategy="afterInteractive"
-        />
+    <script
+  src="https://hamza-phase-1.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
+  data-api="https://preta-dashboardphasev1-1.pushkarnagwekar.workers.dev/api"
+  data-ctx-endpoint="https://saasify-backend-ps2n.onrender.com/users/preta-token"
+  data-ctx-token-key="saasify_access_token"
+  data-debug="true">
+</script>
 
 
         {/* Standard Next.js app-shell wrapper. App Router doesn't emit the
