@@ -42,7 +42,7 @@ export default function RootLayout({ children }) {
         />
         */}
         <Script
-          src="https://hamza-phase-1.pushkarnagwekar.workers.dev/boot?d=saas-tan-omega.vercel.app"
+          src="https://hamza-phase-1.pushkarnagwekar.workers.dev/boot?d=saas-nextjs-flax.vercel.app/"
           data-api="https://preta-dashboardphasev1-1.pushkarnagwekar.workers.dev/api"
           data-ctx-endpoint="/api/preta-token"
           strategy="afterInteractive"
