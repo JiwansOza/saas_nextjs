@@ -42,12 +42,12 @@ export default function RootLayout({ children }) {
         />
         */}
         <Script
-          id="preta-loader"
-          src="https://audiance-loader-worker.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
+          src="https://hamza-phase-1.pushkarnagwekar.workers.dev/boot?d=saas-tan-omega.vercel.app"
+          data-api="https://preta-dashboardphasev1-1.pushkarnagwekar.workers.dev/api"
+          data-ctx-endpoint="/api/preta-token"
           strategy="afterInteractive"
-          data-api="https://app.pretasystems.com/api"
-          data-debug="true"
         />
+
 
         {/* Standard Next.js app-shell wrapper. App Router doesn't emit the
             #__next node that Pages Router does, but the Preta loader looks for
