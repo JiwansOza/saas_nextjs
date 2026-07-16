@@ -33,7 +33,22 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-    
+
+      {/* Preta anti-flicker — hides the page so the site's own content doesn't paint
+          before Preta injects, then the loader's revealPage() calls __preta_af_clear
+          to show everything together (no pop-in). NOTE: this app fetches its context
+          from a SLOW external backend (data-ctx-endpoint on Render, cold-start 1-3s),
+          so the fallback is capped at 1.5s — otherwise a cold start would blank the
+          page for seconds. Warm/repeat loads (session-cached JWT) reveal cleanly at
+          ~280ms. For a fully clean first load this app should move to window-var
+          (sign the JWT server-side like the doctor demo) so there is no ctx fetch. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "(function(){document.documentElement.style.opacity='0';var t=setTimeout(function(){document.documentElement.style.opacity='';},1500);window.__preta_af_clear=function(){clearTimeout(t);document.documentElement.style.transition='opacity .15s';document.documentElement.style.opacity='1';setTimeout(function(){document.documentElement.style.transition='';document.documentElement.style.opacity='';},200);};})();",
+        }}
+      />
+
       <Script
   id="preta-loader"
   src="https://hamza-phase-1.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
