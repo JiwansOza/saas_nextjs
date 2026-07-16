@@ -1,12 +1,8 @@
-"use client";
-
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
+import { cookies } from "next/headers";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { useEffect, useState } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import ClientShell from "@/components/ClientShell";
+import { createPretaContextToken } from "@/lib/preta-token";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,65 +14,64 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export default function RootLayout({ children }) {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mounted, setMounted] = useState(false);
+// Read the logged-in user's Preta attributes from the saasify_session cookie (set at
+// login — 24h, contains { pretaUser: { plan, role, has_paid, ... } }). We sign these
+// SERVER-SIDE on every request and hand the loader a fresh JWT via window.__PRETA_CTX__.
+// This replaces the old data-ctx-endpoint fetch, whose reliance on the short-lived
+// saasify_access_token caused a 401 (→ personalized element hidden until re-login).
+async function getPretaContext() {
+  try {
+    const raw = (await cookies()).get("saasify_session")?.value;
+    if (!raw) return { pretaUser: null, token: null };
+    const session = JSON.parse(decodeURIComponent(raw));
+    const pretaUser = session.pretaUser || null;
+    if (!pretaUser) return { pretaUser: null, token: null };
+    const token = await createPretaContextToken(pretaUser);
+    return { pretaUser, token };
+  } catch (e) {
+    console.error("[Preta] context sign error:", e?.message);
+    return { pretaUser: null, token: null };
+  }
+}
 
-  useEffect(() => {
-    setMounted(true);
-    const handleScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
+export default async function RootLayout({ children }) {
+  const { pretaUser, token } = await getPretaContext();
 
   return (
     <html lang="en">
+      <head>
+        {/* Preta anti-flicker — hide instantly, reveal once the loader injects. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){document.documentElement.style.opacity='0';var t=setTimeout(function(){document.documentElement.style.opacity='';},1500);window.__preta_af_clear=function(){clearTimeout(t);document.documentElement.style.transition='opacity .15s';document.documentElement.style.opacity='1';setTimeout(function(){document.documentElement.style.transition='';document.documentElement.style.opacity='';},200);};})();",
+          }}
+        />
+        {/* Preta context — signed server-side, exposed for the loader BEFORE it runs.
+            window.pretaUser feeds client-side targeting; window.__PRETA_CTX__ is the
+            signed JWT the edge verifies (data-ctx-var). No network fetch → no 401. */}
+        {(pretaUser || token) && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: [
+                pretaUser ? `window.pretaUser=${JSON.stringify(pretaUser)};` : "",
+                token ? `window.__PRETA_CTX__=${JSON.stringify(token)};` : "",
+              ].join(""),
+            }}
+          />
+        )}
+        {/* Preta loader — single-stage (/?d=), context via window var (data-ctx-var). */}
+        <script
+          src="https://hamza-phase-1.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
+          defer
+          data-api="https://app.pretasystems.com/v2/api"
+          data-ctx-var="__PRETA_CTX__"
+        ></script>
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-
-      {/* Preta anti-flicker — hides the page so the site's own content doesn't paint
-          before Preta injects, then the loader's revealPage() calls __preta_af_clear
-          to show everything together (no pop-in). NOTE: this app fetches its context
-          from a SLOW external backend (data-ctx-endpoint on Render, cold-start 1-3s),
-          so the fallback is capped at 1.5s — otherwise a cold start would blank the
-          page for seconds. Warm/repeat loads (session-cached JWT) reveal cleanly at
-          ~280ms. For a fully clean first load this app should move to window-var
-          (sign the JWT server-side like the doctor demo) so there is no ctx fetch. */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html:
-            "(function(){document.documentElement.style.opacity='0';var t=setTimeout(function(){document.documentElement.style.opacity='';},1500);window.__preta_af_clear=function(){clearTimeout(t);document.documentElement.style.transition='opacity .15s';document.documentElement.style.opacity='1';setTimeout(function(){document.documentElement.style.transition='';document.documentElement.style.opacity='';},200);};})();",
-        }}
-      />
-
-      <Script
-  id="preta-loader"
-  src="https://hamza-phase-1.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
-  strategy="afterInteractive"
-  data-api="https://app.pretasystems.com/v2/api"
-  data-ctx-endpoint="https://saasify-backend-ps2n.onrender.com/users/preta-token"
-  data-ctx-token-key="saasify_access_token"
-  data-debug="true"
-/>
-
-  
-
-        {/* Standard Next.js app-shell wrapper. App Router doesn't emit the
-            #__next node that Pages Router does, but the Preta loader looks for
-            it (or #root) to reserve banner space cleanly via a shell margin.
-            Without a recognized shell the loader falls back to body-level
-            hacks and the injected banner mis-lays out the navbar/content. */}
+        {/* App-shell wrapper the loader keys off for clean banner layout. */}
         <div id="__next">
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Navbar isScrolled={isScrolled} mounted={mounted} />
-            {children}
-            <Footer />
-          </ThemeProvider>
+          <ClientShell>{children}</ClientShell>
         </div>
       </body>
     </html>
