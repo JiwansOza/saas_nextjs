@@ -64,7 +64,7 @@ export default async function RootLayout({ children }) {
         <script
           src="https://hamza-phase-1.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
           defer
-          data-api="https://app.pretasystems.com/v2/api"
+          data-api="https://hamza-phase-1.pushkarnagwekar.workers.dev/v2/api"
           data-ctx-var="__PRETA_CTX__"
         ></script>
       </head>
