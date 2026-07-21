@@ -60,11 +60,11 @@ export default async function RootLayout({ children }) {
             }}
           />
         )}
-        {/* Preta loader — single-stage (/?d=), context via window var (data-ctx-var). */}
+        {/* Preta loader — v2, context via window var (data-ctx-var). */}
         <script
-          src="https://hamza-phase-1.pushkarnagwekar.workers.dev/?d=saas-nextjs-flax.vercel.app"
+          src="https://loader-v2.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app"
           defer
-          data-api="/px"
+          data-api="https://app.pretasystems.com/v2/api"
           data-ctx-var="__PRETA_CTX__"
         ></script>
       </head>
