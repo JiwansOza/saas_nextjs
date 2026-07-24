@@ -70,7 +70,7 @@ export default async function RootLayout({ children }) {
         {/* Preta boot loader — added per request (fetch-based context via data-ctx-endpoint). */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
-          src="https://loader.pretasystems.com/loader-v1/boot?d=saas-nextjs-flax.vercel.app/*"
+          src="https://loader-v1.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app/*"
           data-api="https://app.pretasystems.com/v1/api"
           data-ctx-endpoint="/api/preta-token"
         ></script>
