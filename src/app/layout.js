@@ -61,12 +61,12 @@ export default async function RootLayout({ children }) {
           />
         )}
         {/* Preta loader — v2, context via window var (data-ctx-var). */}
-        <script
+        {/* <script
           src="https://loader-v2.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app"
           defer
           data-api="https://app.pretasystems.com/v2/api"
           data-ctx-var="__PRETA_CTX__"
-        ></script>
+        ></script> */}
         {/* Preta boot loader — added per request (fetch-based context via data-ctx-endpoint). */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
