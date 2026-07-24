@@ -67,6 +67,13 @@ export default async function RootLayout({ children }) {
           data-api="/px"
           data-ctx-var="__PRETA_CTX__"
         ></script>
+        {/* Preta boot loader — added per request (fetch-based context via data-ctx-endpoint). */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script
+          src="https://loader.pretasystems.com/loader-v1/boot?d=saas-nextjs-flax.vercel.app/*"
+          data-api="https://app.pretasystems.com/v1/api"
+          data-ctx-endpoint="/api/preta-token"
+        ></script>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {/* App-shell wrapper the loader keys off for clean banner layout. */}
