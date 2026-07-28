@@ -72,10 +72,10 @@ export default async function RootLayout({ children }) {
             is no /api/preta-token fetch (that route doesn't exist → was returning 404). */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
-  src="https://yash-loader-worker.pushkarnagwekar.workers.dev/boot?d=saas-nextjs-flax.vercel.app"
-  data-api="http://localhost:3000/v1/api"
-  data-ctx-var="__PRETA_CTX__"
-></script>
+          src="https://loader-v1.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app"
+          data-api="https://app.pretasystems.com/v1/api"
+          data-ctx-var="__PRETA_CTX__"
+        ></script>
 
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
