@@ -20,7 +20,7 @@ const Footer = () => {
             <div className="flex gap-4">
               <Link
                 href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -40,7 +40,7 @@ const Footer = () => {
               </Link>
               <Link
                 href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -60,7 +60,7 @@ const Footer = () => {
               </Link>
               <Link
                 href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -88,7 +88,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/features"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground"
                 >
                   Features
                 </Link>
@@ -96,7 +96,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/pricing"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground"
                 >
                   Pricing
                 </Link>
@@ -104,7 +104,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/integrations"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground"
                 >
                   Integrations
                 </Link>
@@ -112,7 +112,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/api-reference"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground"
                 >
                   API
                 </Link>
@@ -125,7 +125,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/doc"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground"
                 >
                   Documentation
                 </Link>
@@ -133,7 +133,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/guides"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground"
                 >
                   Guides
                 </Link>
@@ -141,7 +141,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/blogs"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground"
                 >
                   Blog
                 </Link>
@@ -149,7 +149,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground"
                 >
                   Support
                 </Link>
@@ -162,7 +162,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/about-us"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground"
                 >
                   About
                 </Link>
@@ -170,7 +170,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/careers"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground"
                 >
                   Careers
                 </Link>
@@ -178,7 +178,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/privacy-policy"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground"
                 >
                   Privacy Policy
                 </Link>
@@ -186,7 +186,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/contact-us"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground"
                 >
                   Contact Us
                 </Link>
@@ -201,19 +201,19 @@ const Footer = () => {
           <div className="flex gap-4">
             <Link
               href="/privacy-policy"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground"
             >
               Privacy Policy
             </Link>
             <Link
               href="/"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground"
             >
               Terms of Service
             </Link>
             <Link
               href="/"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground"
             >
               Cookie Policy
             </Link>
