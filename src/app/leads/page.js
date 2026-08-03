@@ -3,12 +3,9 @@
 /**
  * Leads received from Preta.
  *
- * Preta does not store lead data — it delivers each submission to this app's own backend, which
- * writes it to MongoDB. This page reads them back, so it doubles as an end-to-end check that a
- * form element actually lands somewhere.
- *
- * Reads from the backend directly (same place the login and signup pages go) rather than through
- * a Next.js route, so there is exactly one copy of the leads and one place they live.
+ * Preta runs this site's forms in `direct` mode: the visitor's browser posts the payload straight
+ * to our own backend, which writes it to MongoDB. Preta keeps only metadata. This page reads the
+ * leads back, so it doubles as an end-to-end check that a form element actually lands somewhere.
  */
 
 import { useCallback, useEffect, useState } from "react";
@@ -25,36 +22,8 @@ function formatTime(iso) {
   );
 }
 
-function RouteBadge({ route, verification }) {
-  const isPreta = route === "through-preta";
-  const label = isPreta ? "Through Preta" : "Direct";
-
-  // Only a signed request can be verified, so this reads as a warning solely on the Preta path.
-  const suspicious = isPreta && verification !== "verified";
-
-  return (
-    <div className="flex flex-col gap-1">
-      <span
-        className={`inline-flex w-fit items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-          isPreta
-            ? "bg-blue-500/10 text-blue-500 ring-1 ring-blue-500/20"
-            : "bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20"
-        }`}
-      >
-        {label}
-      </span>
-      {suspicious && (
-        <span className="text-xs text-amber-500">
-          {verification === "no-secret-configured" ? "unsigned — no secret set" : verification}
-        </span>
-      )}
-    </div>
-  );
-}
-
 export default function LeadsPage() {
   const [leads, setLeads] = useState([]);
-  const [secretConfigured, setSecretConfigured] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -64,7 +33,6 @@ export default function LeadsPage() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setLeads(data.leads || []);
-      setSecretConfigured(!!data.signingSecretConfigured);
       setError("");
     } catch (e) {
       // The backend runs on Render's free tier, which sleeps when idle — the first request
@@ -85,17 +53,15 @@ export default function LeadsPage() {
   }, [load]);
 
   // Form fields vary per element, so build the columns from whatever actually arrived.
-  const fieldKeys = [
-    ...new Set(leads.flatMap((l) => Object.keys(l.formData || {}))),
-  ];
+  const fieldKeys = [...new Set(leads.flatMap((l) => Object.keys(l.formData || {})))];
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-12 md:px-8">
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">Leads</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Form submissions delivered here by Preta. Preta itself does not store this data.
+            Form submissions delivered straight to this site’s backend. Preta never receives this data.
           </p>
         </div>
         <button
@@ -104,20 +70,6 @@ export default function LeadsPage() {
         >
           Refresh
         </button>
-      </div>
-
-      <div className="mb-8 flex flex-wrap gap-3 text-xs">
-        <span
-          className={`rounded-md px-3 py-1.5 ring-1 ${
-            secretConfigured
-              ? "bg-emerald-500/10 text-emerald-600 ring-emerald-500/20"
-              : "bg-muted text-muted-foreground ring-border"
-          }`}
-        >
-          {secretConfigured
-            ? "Signature verification on"
-            : "PRETA_SIGNING_SECRET not set — signatures not checked"}
-        </span>
       </div>
 
       {error && (
@@ -134,7 +86,9 @@ export default function LeadsPage() {
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
             Submit a form on this site and it will appear here within a few seconds. If nothing
             arrives, check that the delivery endpoint in Preta points at{" "}
-            <code className="rounded bg-muted px-1 py-0.5">{BACKEND_URL}/leads</code>.
+            <code className="rounded bg-muted px-1 py-0.5">{BACKEND_URL}/leads</code>, and that the
+            backend allows CORS from this site — without it the browser cannot deliver, and in
+            direct mode there is no retry.
           </p>
         </div>
       ) : (
@@ -143,7 +97,6 @@ export default function LeadsPage() {
             <thead className="border-b bg-muted/50">
               <tr>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">Received</th>
-                <th className="whitespace-nowrap px-4 py-3 font-medium">Route</th>
                 {fieldKeys.map((k) => (
                   <th key={k} className="whitespace-nowrap px-4 py-3 font-medium">
                     {k}
@@ -157,9 +110,6 @@ export default function LeadsPage() {
                 <tr key={lead.id} className="border-b last:border-0 hover:bg-muted/30">
                   <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
                     {formatTime(lead.receivedAt)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <RouteBadge route={lead.route} verification={lead.verification} />
                   </td>
                   {fieldKeys.map((k) => (
                     <td key={k} className="px-4 py-3">
