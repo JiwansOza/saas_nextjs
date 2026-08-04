@@ -26,6 +26,8 @@ export default function LeadsPage() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  // Which row is mid-delete, so only that button shows a pending state.
+  const [deletingId, setDeletingId] = useState(null);
 
   const load = useCallback(async () => {
     try {
@@ -52,6 +54,32 @@ export default function LeadsPage() {
     return () => clearInterval(t);
   }, [load]);
 
+  const deleteLead = useCallback(async (id) => {
+    setDeletingId(id);
+    try {
+      const res = await fetch(`${BACKEND_URL}/leads/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // Drop it locally rather than refetching — the 5s poll would otherwise briefly
+      // re-show the row before the next fetch lands.
+      setLeads((prev) => prev.filter((l) => l.id !== id));
+    } catch (e) {
+      setError(`Could not delete lead — ${e.message}`);
+    } finally {
+      setDeletingId(null);
+    }
+  }, []);
+
+  const deleteAll = useCallback(async () => {
+    if (!confirm(`Delete all ${leads.length} leads? This cannot be undone.`)) return;
+    try {
+      const res = await fetch(`${BACKEND_URL}/leads?confirm=yes`, { method: "DELETE" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setLeads([]);
+    } catch (e) {
+      setError(`Could not delete leads — ${e.message}`);
+    }
+  }, [leads.length]);
+
   // Form fields vary per element, so build the columns from whatever actually arrived.
   const fieldKeys = [...new Set(leads.flatMap((l) => Object.keys(l.formData || {})))];
 
@@ -64,12 +92,22 @@ export default function LeadsPage() {
             Form submissions delivered straight to this site’s backend. Preta never receives this data.
           </p>
         </div>
-        <button
-          onClick={load}
-          className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
-        >
-          Refresh
-        </button>
+        <div className="flex gap-2">
+          {leads.length > 0 && (
+            <button
+              onClick={deleteAll}
+              className="rounded-lg border border-red-500/30 px-4 py-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/10"
+            >
+              Delete all
+            </button>
+          )}
+          <button
+            onClick={load}
+            className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -103,6 +141,7 @@ export default function LeadsPage() {
                   </th>
                 ))}
                 <th className="whitespace-nowrap px-4 py-3 font-medium">Page</th>
+                <th className="w-px whitespace-nowrap px-4 py-3" />
               </tr>
             </thead>
             <tbody>
@@ -118,6 +157,15 @@ export default function LeadsPage() {
                   ))}
                   <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
                     {lead.pathname || "—"}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right">
+                    <button
+                      onClick={() => deleteLead(lead.id)}
+                      disabled={deletingId === lead.id}
+                      className="rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:opacity-40"
+                    >
+                      {deletingId === lead.id ? "Deleting…" : "Delete"}
+                    </button>
                   </td>
                 </tr>
               ))}
