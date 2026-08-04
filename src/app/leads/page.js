@@ -135,6 +135,9 @@ export default function LeadsPage() {
             <thead className="border-b bg-muted/50">
               <tr>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">Received</th>
+                {/* Which form this came from. pathname alone is not enough — one page can carry
+                    a hero form and a footer form, and both would look identical without this. */}
+                <th className="whitespace-nowrap px-4 py-3 font-medium">Form</th>
                 {fieldKeys.map((k) => (
                   <th key={k} className="whitespace-nowrap px-4 py-3 font-medium">
                     {k}
@@ -149,6 +152,24 @@ export default function LeadsPage() {
                 <tr key={lead.id} className="border-b last:border-0 hover:bg-muted/30">
                   <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
                     {formatTime(lead.receivedAt)}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3">
+                    {lead.formName || lead.elementType ? (
+                      <div className="flex flex-col">
+                        <span className="font-medium">{lead.formName || "Untitled form"}</span>
+                        {lead.elementType && (
+                          <span className="text-xs capitalize text-muted-foreground">
+                            {lead.elementType.replace(/_/g, " ")}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      // Leads captured before this shipped carry no name — show the id rather
+                      // than a dash, so they can still be traced back to an element.
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {lead.elementId || "—"}
+                      </span>
+                    )}
                   </td>
                   {fieldKeys.map((k) => (
                     <td key={k} className="px-4 py-3">
