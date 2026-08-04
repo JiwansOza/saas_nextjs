@@ -12,6 +12,11 @@ import { useCallback, useEffect, useState } from "react";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
+/** The domain Preta files this site's submissions under — must match the loader's ?d= value.
+ *  The backend is shared with the other demo site, so every request is scoped by domain;
+ *  without it this page would list that site's submissions as if they were ours. */
+const SITE_DOMAIN = "saas-nextjs-flax.vercel.app";
+
 function formatTime(iso) {
   if (!iso) return "—";
   const d = new Date(iso);
@@ -31,7 +36,10 @@ export default function LeadsPage() {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch(`${BACKEND_URL}/leads`, { cache: "no-store" });
+      const res = await fetch(
+        `${BACKEND_URL}/leads?domain=${encodeURIComponent(SITE_DOMAIN)}`,
+        { cache: "no-store" }
+      );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setLeads(data.leads || []);
@@ -72,7 +80,12 @@ export default function LeadsPage() {
   const deleteAll = useCallback(async () => {
     if (!confirm(`Delete all ${leads.length} leads? This cannot be undone.`)) return;
     try {
-      const res = await fetch(`${BACKEND_URL}/leads?confirm=yes`, { method: "DELETE" });
+      // Scoped to this domain — the backend is shared, and an unscoped delete would take the
+      // other site's leads with it.
+      const res = await fetch(
+        `${BACKEND_URL}/leads?confirm=yes&domain=${encodeURIComponent(SITE_DOMAIN)}`,
+        { method: "DELETE" }
+      );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setLeads([]);
     } catch (e) {
