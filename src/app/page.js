@@ -10,6 +10,7 @@ import TestimonialSection from "@/components/TestimonialSection";
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
+import PretaTestBlock from "@/components/PretaTestBlock";
 
 export default function LandingPage() {
   const container = {
@@ -35,6 +36,9 @@ export default function LandingPage() {
 
         {/* Logos Section */}
         <LogoSection />
+
+        {/* Preta test block — identical on Home / Features / Testimonials / Pricing */}
+        <PretaTestBlock />
 
         {/* Features Section */}
         <FeatureSection container={container} item={item} />

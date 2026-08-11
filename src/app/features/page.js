@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import PretaTestBlock from "@/components/PretaTestBlock";
 import {
   CheckCircle,
   BarChart3,
@@ -54,6 +55,10 @@ export default function FeaturesPage() {
           Discover the core features that make our SaaS platform efficient,
           scalable, and user-friendly.
         </p>
+      </div>
+
+      <div className="w-full max-w-6xl mt-12">
+        <PretaTestBlock />
       </div>
 
       <div className="grid md:grid-cols-3 gap-6 mt-12 w-full max-w-6xl">
