@@ -97,16 +97,20 @@ export default function PretaTestBlock() {
           </p>
           <div className="grid gap-6 md:grid-cols-2">
             <figure className="flex flex-col items-center gap-3 rounded-xl border bg-background p-6">
+              {/* Deliberately NOT /meta-logo.png: that file is also used five times by
+                  LogoSection on the home page, so a src-based match could not tell them
+                  apart and the test would not show whether the replacement hit one element
+                  or every copy of the asset. */}
               <Image
                 id="preta-image-1"
-                src="/meta-logo.png"
+                src="/blog2.jpg"
                 alt="Preta test image one"
                 width={160}
                 height={80}
-                className="h-20 w-auto object-contain"
+                className="h-20 w-auto rounded object-cover"
               />
               <figcaption className="text-sm text-muted-foreground">
-                Image 1 — logo
+                Image 1 — unique to this block
               </figcaption>
             </figure>
 
