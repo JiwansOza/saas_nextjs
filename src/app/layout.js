@@ -71,10 +71,14 @@ export default async function RootLayout({ children }) {
             loader above. The app already signs window.__PRETA_CTX__ server-side, so there
             is no /api/preta-token fetch (that route doesn't exist → was returning 404). */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        {/* data-debug: turns on the loader's log() output (it is silent otherwise), so the
+            console shows which elements were fetched, matched and injected. Debugging aid on
+            this test site only — remove it before this pattern reaches a customer page. */}
         <script
           src="https://loader-v1.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app"
           data-api="https://app.pretasystems.com/v1/api"
           data-ctx-var="__PRETA_CTX__"
+          data-debug="true"
         ></script>
 
       </head>
