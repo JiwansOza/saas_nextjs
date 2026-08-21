@@ -6,6 +6,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
+import { clearPretaCookie } from "@/lib/preta-cookie";
 
 function getSession() {
   try {
@@ -48,10 +49,14 @@ const Navbar = ({ isScrolled, mounted }) => {
 
   const handleLogout = () => {
     clearSession();
+    // Drop the Preta context too, or a signed-out visitor keeps seeing personalised
+    // content until the token expires on its own. Middleware would also clear it on the
+    // next document request, but doing it here makes logout self-contained — this stays
+    // correct even if the redirect below is ever removed.
+    clearPretaCookie();
     // Logout must also invalidate the access token — otherwise a logged-out visitor's
-    // token stays valid until it expires, and anything reading it (our own APIs OR the
-    // Preta SDK's ctx-endpoint) keeps treating the user as signed in. Clearing it makes
-    // /users/preta-token return 401 → the personalized element is removed.
+    // token stays valid until it expires, and anything reading it keeps treating the user
+    // as signed in.
     try { localStorage.removeItem("saasify_access_token"); } catch (e) {}
     setSession(null);
     window.location.href = "/";

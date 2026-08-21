@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { setPretaCookie } from "@/lib/preta-cookie";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
@@ -108,6 +109,11 @@ const BILLING_STATUSES = [
       }
 
       localStorage.setItem("saasify_access_token", data.access_token);
+
+      // Preta context (data-ctx-cookie). Registration signs a user in too, so this moment
+      // needs the cookie exactly as much as login does — the backend already returns
+      // `preta_token` here as well.
+      setPretaCookie(data.preta_token);
 
       setSessionCookie({
         name:      data.user.name,

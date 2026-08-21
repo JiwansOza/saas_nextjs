@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { setPretaCookie } from "@/lib/preta-cookie";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
@@ -51,6 +52,12 @@ export default function LoginPage() {
       }
 
       localStorage.setItem("saasify_access_token", data.access_token);
+
+      // Preta context (data-ctx-cookie). The backend already signs this and returns it as
+      // `preta_token` — all this does is put it on OUR domain, where the loader can read
+      // it. It must be written BEFORE the redirect below, or the first signed-in page
+      // renders with no context and the visitor looks anonymous.
+      setPretaCookie(data.preta_token);
 
       setSessionCookie({
         name:      data.user.name,
