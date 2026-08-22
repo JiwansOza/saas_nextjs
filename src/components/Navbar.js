@@ -6,7 +6,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
-import { clearPretaCookie } from "@/lib/preta-cookie";
+import { endSession } from "@/lib/session";
 
 function getSession() {
   try {
@@ -47,18 +47,15 @@ const Navbar = ({ isScrolled, mounted }) => {
     return () => document.removeEventListener("mousedown", close);
   }, [profileOpen]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     clearSession();
-    // Drop the Preta context too, or a signed-out visitor keeps seeing personalised
-    // content until the token expires on its own. Middleware would also clear it on the
-    // next document request, but doing it here makes logout self-contained — this stays
-    // correct even if the redirect below is ever removed.
-    clearPretaCookie();
-    // Logout must also invalidate the access token — otherwise a logged-out visitor's
-    // token stays valid until it expires, and anything reading it keeps treating the user
-    // as signed in.
-    try { localStorage.removeItem("saasify_access_token"); } catch (e) {}
     setSession(null);
+    // Revokes the refresh token server-side, stops the renewal schedule, and clears both the
+    // access token and the Preta context. The server call matters now that refresh works:
+    // without it the rotated refresh cookie would outlive logout by seven days and could
+    // mint fresh sessions. Clearing the Preta cookie is what stops a signed-out visitor from
+    // continuing to see personalised content.
+    await endSession();
     window.location.href = "/";
   };
 
