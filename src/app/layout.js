@@ -32,13 +32,18 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        {/* Preta anti-flicker — hide instantly, reveal once the loader injects. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "(function(){document.documentElement.style.opacity='0';var t=setTimeout(function(){document.documentElement.style.opacity='';},1500);window.__preta_af_clear=function(){clearTimeout(t);document.documentElement.style.transition='opacity .15s';document.documentElement.style.opacity='1';setTimeout(function(){document.documentElement.style.transition='';document.documentElement.style.opacity='';},200);};})();",
-          }}
-        />
+        {/* The Preta anti-flicker snippet used to sit here: it set opacity:0 on <html> and
+            waited up to 1500 ms for the loader to reveal the page. It worked, but the cost was
+            the whole site being invisible for ~380–680 ms of every load — this site was being
+            held back so Preta could catch up.
+
+            Removed deliberately. Preta now places its elements during parse, from a decision
+            persisted by the previous load, so they land in the same paint as the site's own
+            content instead of after it. Nothing has to be hidden for that to look right.
+
+            Preta's own two hides are off as well: the /boot opacity hide and the loader's
+            800 ms one are both governed by the `anti_flicker` flag, now false. Turning that
+            flag back on is what brings hiding back — this snippet does not need to return. */}
         {/* No context <script> here any more. The signed JWT lives in the `preta_ctx`
             cookie, written by src/lib/preta-cookie.js from the token our backend returns,
             and the loader reads it from there itself.
