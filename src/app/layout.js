@@ -76,14 +76,27 @@ export default function RootLayout({ children }) {
 
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* App-shell wrapper the loader keys off for clean banner layout —
-            commented out for now (Hamza's 86409ef). Restore the <div id="__next">
-            wrapper if the injected banner starts mis-laying out navbar/content:
-            <div id="__next">
-              <ClientShell>{children}</ClientShell>
-            </div>
-        */}
-        <ClientShell>{children}</ClientShell>
+        {/* App-shell wrapper the loader keys off. Do NOT remove it (see a11c11c, reverted).
+            The App Router does not emit #__next the way the Pages Router does, so this supplies
+            it deliberately, and two separate things depend on it:
+
+            1. Banner layout. The loader looks for a recognised shell to push down for banner
+               space ('.application-main, ytd-app, #root, #__next, main[role="main"], #content'
+               — see loader-src/injectors/banner.js). With none, it falls back to body-level
+               positioning: the banner mounts position:relative as <body>'s FIRST child, so
+               hydration removing it collapses the space and the navbar visibly jumps.
+
+            2. Every element's targetSelector. Selectors are structural paths
+               ('body > div:nth-of-type(2) > main > section…'), so deleting a wrapper shifts all
+               of them. Measured while it was commented out: #__next absent and ALL NINE
+               selectors matched zero nodes. Elements only still appeared through the injectors'
+               anchorText fallback, which runs later — early-inject dropped from 8 elements to
+               1, and paint slipped from ~+8ms to +24–41ms after FCP.
+
+            If the shell ever has to change, re-record the element selectors along with it. */}
+        <div id="__next">
+          <ClientShell>{children}</ClientShell>
+        </div>
       </body>
     </html>
   );
