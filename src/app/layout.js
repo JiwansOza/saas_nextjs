@@ -76,10 +76,14 @@ export default function RootLayout({ children }) {
 
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* App-shell wrapper the loader keys off for clean banner layout. */}
-        <div id="__next">
-          <ClientShell>{children}</ClientShell>
-        </div>
+        {/* App-shell wrapper the loader keys off for clean banner layout —
+            commented out for now (Hamza's 86409ef). Restore the <div id="__next">
+            wrapper if the injected banner starts mis-laying out navbar/content:
+            <div id="__next">
+              <ClientShell>{children}</ClientShell>
+            </div>
+        */}
+        <ClientShell>{children}</ClientShell>
       </body>
     </html>
   );
