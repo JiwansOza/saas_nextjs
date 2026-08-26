@@ -69,7 +69,7 @@ export default function RootLayout({ children }) {
         {/* Start the DNS + TLS handshake to the loader origin before the parser reaches the
             script tag below. The boot request is cross-origin, so without this its round trip
             includes a fresh connection setup on every cold visit. */}
-        <link rel="preconnect" href="https://loader-v1.pretasystems.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://loader-v1.pretasystems.com" />
         {/* async + fetchpriority, deliberately together:
 
             async  — the parser never stops for this tag. Without it the script is
