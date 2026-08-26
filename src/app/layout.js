@@ -81,7 +81,7 @@ export default function RootLayout({ children }) {
                      asks for the priority back without giving the parser back. */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
-          async
+          // async
           fetchPriority="high"
           src="https://loader-v1.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app"
           data-api="https://app.pretasystems.com/v1/api"
