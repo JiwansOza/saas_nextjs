@@ -68,6 +68,7 @@ export default function RootLayout({ children }) {
             this test site only — remove it before this pattern reaches a customer page. */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
+          async
           src="https://loader-v1.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app"
           data-api="https://app.pretasystems.com/v1/api"
           data-ctx-cookie="preta_ctx"
