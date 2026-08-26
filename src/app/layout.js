@@ -66,9 +66,23 @@ export default function RootLayout({ children }) {
         {/* data-debug: turns on the loader's log() output (it is silent otherwise), so the
             console shows which elements were fetched, matched and injected. Debugging aid on
             this test site only — remove it before this pattern reaches a customer page. */}
+        {/* Start the DNS + TLS handshake to the loader origin before the parser reaches the
+            script tag below. The boot request is cross-origin, so without this its round trip
+            includes a fresh connection setup on every cold visit. */}
+        <link rel="preconnect" href="https://loader-v1.pretasystems.com" crossOrigin="anonymous" />
+        {/* async + fetchpriority, deliberately together:
+
+            async  — the parser never stops for this tag. Without it the script is
+                     parser-blocking, and measured on this site that delayed the page's OWN
+                     first contentful paint by ~304 ms (FCP 636 ms with it, 332 ms without).
+
+            fetchpriority="high" — async alone hands the request LOW network priority, which
+                     pushed the element's arrival from ~90 ms to ~200 ms on a warm load. This
+                     asks for the priority back without giving the parser back. */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
           async
+          fetchPriority="high"
           src="https://loader-v1.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app"
           data-api="https://app.pretasystems.com/v1/api"
           data-ctx-cookie="preta_ctx"
