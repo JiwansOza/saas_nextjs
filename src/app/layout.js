@@ -66,10 +66,12 @@ export default function RootLayout({ children }) {
         {/* data-debug: turns on the loader's log() output (it is silent otherwise), so the
             console shows which elements were fetched, matched and injected. Debugging aid on
             this test site only — remove it before this pattern reaches a customer page. */}
-        {/* Start the DNS + TLS handshake to the loader origin before the parser reaches the
-            script tag below. The boot request is cross-origin, so without this its round trip
-            includes a fresh connection setup on every cold visit. */}
-        <link rel="preconnect" href="https://loader-v1.pretasystems.com" />
+        {/* The preconnect that used to be here is gone, and so is the thing it was for.
+            Measured on a cold visit, /boot spent 240-272 ms waiting for a TCP+TLS handshake
+            that only existed because the loader was a different origin — and a preconnect
+            could only start that handshake earlier, never remove it (worth 21-93 ms).
+            The loader is now first-party through the /preta/* rewrite in next.config.mjs, so
+            this page's own connection carries it and there is no handshake left to warm. */}
         {/* async + fetchpriority, deliberately together:
 
             async  — the parser never stops for this tag. Without it the script is
@@ -83,7 +85,10 @@ export default function RootLayout({ children }) {
         <script
           // async
           fetchPriority="high"
-          src="https://loader-v1.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app"
+          // Same-origin, via the /preta/* rewrite in next.config.mjs. `?d=` still names the
+          // tenant — the worker cannot read it from the Host header behind a rewrite, because
+          // what reaches it is its own hostname, not this site's.
+          src="/preta/boot?d=saas-nextjs-flax.vercel.app"
           data-api="https://app.pretasystems.com/v1/api"
           data-ctx-cookie="preta_ctx"
           data-debug="true"
