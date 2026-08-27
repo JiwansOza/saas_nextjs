@@ -66,57 +66,62 @@ export default function RootLayout({ children }) {
         {/* data-debug: turns on the loader's log() output (it is silent otherwise), so the
             console shows which elements were fetched, matched and injected. Debugging aid on
             this test site only — remove it before this pattern reaches a customer page. */}
-        {/* Start the handshake, then fetch both assets alongside /boot instead of behind it.
+        {/* THE HANDSHAKE. Measured on a cold visit, the first request to the loader spends
+            145 ms (tcp 66 + tls 79) on a TCP+TLS handshake that exists only because the loader
+            is a different origin. A preconnect cannot remove that, only start it earlier —
+            worth 21-93 ms, because the parser reaches the tags below at ~byte 2200 rather than
+            at header time.
 
-            THE HANDSHAKE. Measured on a cold visit, /boot spends 145 ms (tcp 66 + tls 79) on a
-            TCP+TLS handshake that exists only because the loader is a different origin. A
-            preconnect cannot remove that, only start it earlier — worth 21-93 ms, because the
-            parser reaches this tag at ~byte 2200 rather than at header time.
-
-            THE TWO PRELOADS. /boot's response is what NAMES the config and the bundle, so
-            without these neither can begin until it returns: measured, /boot 90→422 ms and only
-            then config 428→564 ms. Naming them here moved the config to 118→415 ms — it now
-            finishes with /boot rather than after it. Both URLs are stable for exactly this
-            reason; the worker serves them stale-while-revalidate, so a repeat visit still reads
-            them from cache in 0 ms.
-
-            NO crossOrigin ON ANY OF THESE. A preconnect or preload carrying crossorigin opens an
-            anonymous connection, while a plain <script src> needs a credentialed one — different
-            pools, so the warmed socket goes unused and the handshake is paid anyway. That was
-            live on this page and cost the whole benefit: tcp=150 ms, tls=81 ms with the
-            preconnect present, 0 ms once the attribute was removed. The hrefs must also match
-            the script URLs the loader requests EXACTLY, or the preloads are simply downloads
-            nobody uses.
-
-            Honest limit: this makes the DOWNLOADS parallel, and that is all. Measured, the delta
-            against the page's own content did not move (+319 ms → +328 ms), because everything
-            has arrived by ~415 ms and the element still paints at ~674 ms — the remaining wait is
-            the bundle sitting ready while the main thread is busy hydrating this page. */}
+            NO crossOrigin. A preconnect carrying crossorigin opens an ANONYMOUS connection,
+            while a plain <script src> needs a credentialed one — different pools, so the warmed
+            socket goes unused and the handshake is paid anyway. That was live on this page and
+            cost the whole benefit: tcp=150 ms, tls=81 ms with the preconnect present, 0 ms once
+            the attribute was removed. */}
         <link rel="preconnect" href="https://loader-v1.pretasystems.com" />
-        <link
-          rel="preload"
-          as="script"
-          href="https://loader-v1.pretasystems.com/config?d=saas-nextjs-flax.vercel.app"
-        />
-        <link
-          rel="preload"
-          as="script"
-          href="https://loader-v1.pretasystems.com/l/pretaloader.js?d=saas-nextjs-flax.vercel.app"
-        />
-        {/* async + fetchpriority, deliberately together:
+        {/* TWO TAGS, NOT /boot. This is the change that closed the first-load gap.
 
-            async  — the parser never stops for this tag. Without it the script is
-                     parser-blocking, and measured on this site that delayed the page's OWN
-                     first contentful paint by ~304 ms (FCP 636 ms with it, 332 ms without).
+            /boot was one small script whose entire job was to NAME these two URLs and stamp a
+            few window.PRETA_* values. That made it a gate: nothing of ours could begin until it
+            returned. Measured, that serial step cost roughly the whole of /boot — the single
+            largest item in the cold-start gap. Preloading the two files helped their DOWNLOADS
+            start early but did not remove the gate, because the loader still could not run
+            until /boot's script appended it.
 
-            fetchpriority="high" — async alone hands the request LOW network priority, which
-                     pushed the element's arrival from ~90 ms to ~200 ms on a warm load. This
-                     asks for the priority back without giving the parser back. */}
+            Naming them here removes the gate entirely: the browser's preload scanner starts
+            both with the document, and the worker now emits the paint stamps (PRETA_POLICIES,
+            PRETA_DECISION, PRETA_CFGIDS, PRETA_CFGV) from /config instead of /boot.
+
+            MEASURED, six genuine first visits each, fresh browser profile per run, both arms
+            through the same route interception so the harness cost cancels:
+
+              /boot + preloads   delta +88 +146 +225 +254 ms, one run at 0   median +146
+              these two tags     delta 0 ms on all six                       median    0
+
+            ORDER MATTERS AND IS NOT COSMETIC. The bundle reads window.PRETA_CONFIG as it
+            initialises, so config has to have executed first. Two ordinary <script> tags give
+            exactly that: they download in parallel and execute in document order. Do not add
+            `async` — it would let the bundle run first and find no config, and the elements
+            would simply not paint. `defer` is wrong for the opposite reason: it runs after the
+            parser is done, which is precisely the moment we are trying to be earlier than.
+
+            THE COST, stated plainly: two parser-blocking tags mean the 352 KB bundle is parsed
+            and executed while the parser is stopped, where /boot let it run as a dynamically
+            inserted script afterwards. Measured on this page, the site's own first content went
+            from ~523 ms to ~578 ms — about 55 ms later. The delta closed from both directions:
+            our element also moved earlier, ~628 ms to ~578 ms. If that 55 ms matters more than
+            same-paint, /boot still works unchanged — put the old tag back and nothing else
+            needs to change. The durable fix is a smaller bundle (the unused injectors are
+            ~108 KB of it), not a different tag shape.
+
+            data-* live on the LOADER tag: that is the one the bundle finds via
+            document.currentScript. Putting them on the config tag would silently lose them —
+            the loader would fall back to the default API host and every visitor would look
+            anonymous. */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="https://loader-v1.pretasystems.com/config?d=saas-nextjs-flax.vercel.app"></script>
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
-          // async
-          fetchPriority="high"
-          src="https://loader-v1.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app"
+          src="https://loader-v1.pretasystems.com/l/pretaloader.js?d=saas-nextjs-flax.vercel.app"
           data-api="https://app.pretasystems.com/v1/api"
           data-ctx-cookie="preta_ctx"
           data-debug="true"
