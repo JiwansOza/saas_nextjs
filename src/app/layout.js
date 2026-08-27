@@ -85,10 +85,7 @@ export default function RootLayout({ children }) {
         <script
           // async
           fetchPriority="high"
-          // Same-origin, via the /preta/* rewrite in next.config.mjs. `?d=` still names the
-          // tenant — the worker cannot read it from the Host header behind a rewrite, because
-          // what reaches it is its own hostname, not this site's.
-          src="/preta/boot?d=saas-nextjs-flax.vercel.app"
+          src="https://loader-v1.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app"
           data-api="https://app.pretasystems.com/v1/api"
           data-ctx-cookie="preta_ctx"
           data-debug="true"
