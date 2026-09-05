@@ -11,6 +11,7 @@ import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import PretaTestBlock from "@/components/PretaTestBlock";
+import HeavyBallast from "@/components/HeavyBallast";
 
 export default function LandingPage() {
   const container = {
@@ -58,6 +59,13 @@ export default function LandingPage() {
 
         {/* CTA Section */}
         <CTASection />
+
+        {/* Weight ballast — MUST stay last inside <main>. See HeavyBallast.jsx: the live
+            element's selector is a structural path through section:nth-of-type(1), so anything
+            inserted ahead of the existing sections renumbers it and the anchor stops matching.
+            Appending here changes no index. Remove this once the heavy-page measurement is
+            done; it is an instrument, not a feature. */}
+        <HeavyBallast />
       </main>
     </>
   );
