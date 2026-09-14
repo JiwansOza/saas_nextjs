@@ -73,13 +73,27 @@ export default async function RootLayout({ children }) {
         {/* data-debug: turns on the loader's log() output (it is silent otherwise), so the
             console shows which elements were fetched, matched and injected. Debugging aid on
             this test site only — remove it before this pattern reaches a customer page. */}
+        {/* POINTED AT THE TIMEZONE TEST LOADER, NOT loader-v1 — same as deskreact.
+            timezone-test-loader is a throwaway worker on workers.dev with its OWN KV
+            namespace: flags set for it cannot leak into v1, and a purge there cannot
+            clear a customer's cache. Its namespace starts empty, so the first request
+            builds this domain's config from data-api exactly as a new tenant would.
+            Swap back to the production tag below when timezone testing is done. */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script
+          src="https://timezone-test-loader.pushkarnagwekar.workers.dev/boot?d=saas-nextjs-flax.vercel.app"
+          data-api="https://app.pretasystems.com/v1/api"
+          data-ctx-var="__PRETA_CTX__"
+          data-debug="true"
+        ></script>
+
+        {/* Production loader — restore this when the timezone testing is done.
         <script
           src="https://loader-v1.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app"
           data-api="https://app.pretasystems.com/v1/api"
           data-ctx-var="__PRETA_CTX__"
           data-debug="true"
-        ></script>
+        ></script> */}
 
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
