@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { applySession } from "@/lib/session";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
@@ -107,7 +108,10 @@ const BILLING_STATUSES = [
         return;
       }
 
-      localStorage.setItem("saasify_access_token", data.access_token);
+      // Access token + Preta context in one place. The context must land BEFORE the
+      // redirect below, or the first signed-in page renders with no context and the
+      // visitor looks anonymous to the loader.
+      applySession(data);
 
       setSessionCookie({
         name:      data.user.name,

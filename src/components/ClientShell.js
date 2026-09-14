@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { startSession } from "@/lib/session";
 
 export default function ClientShell({ children }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -18,6 +19,11 @@ export default function ClientShell({ children }) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Keep the access token alive past its 15 minutes, and with it the Preta context — the
+  // backend hands both back from /auth/refresh, so renewing the session renews the context.
+  // The schedule lives in lib/session.js and is armed from the token's own expiry.
+  useEffect(() => startSession(), []);
 
   return (
     <ThemeProvider

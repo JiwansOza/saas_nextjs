@@ -78,9 +78,12 @@ export default function PretaTestLogin() {
       pretaUser,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-    // Set saasify_session cookie so /users/preta-token route can read it
+    // NOTE: this component is not mounted anywhere and does NOT set the Preta context.
+    // Since the switch to data-ctx-cookie the context comes from a real backend-signed
+    // token (see src/lib/preta-cookie.js); the fake access token below cannot obtain one,
+    // so a visitor "logged in" here is anonymous to Preta. Wire it to a real login before
+    // using it for Preta testing.
     document.cookie = `saasify_session=${encodeURIComponent(JSON.stringify({ pretaUser }))}; path=/; SameSite=Lax`;
-    // Set saasify_access_token so loader triggers the ctx-endpoint fetch
     localStorage.setItem('saasify_access_token', 'test-session-token');
     window.location.reload();
   };
