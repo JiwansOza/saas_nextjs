@@ -14,15 +14,31 @@
 
 export const PRETA_COOKIE = "preta_ctx";
 
-// The backend signs the context token with `expiresIn: '15m'` — the SAME life as the access
-// token (utils/jwt.js). Keep the cookie's Max-Age identical to both: a cookie that outlived
-// its token would hand the edge something it must reject, and the visitor would look
-// anonymous with no way to tell why.
+// The cookie lives exactly as long as the TOKEN INSIDE IT, read from the token's own `exp`.
 //
-// Because all three now expire together, there is nothing to renew mid-session. The cookie
-// is (re)written at exactly the three points the session itself is issued — login, signup,
-// and /auth/refresh — and cleared at logout.
-const MAX_AGE_SECONDS = 900;
+// It used to be a hardcoded 900 seconds, matching the backend's `expiresIn: '15m'` by hand. Two
+// numbers for one lifetime is a bug waiting to happen in either direction: raise the backend's TTL
+// and the cookie is thrown away while its token is still good (the visitor goes anonymous and the
+// personalised elements vanish); lower it and the cookie outlives its token, handing the edge
+// something it must reject. Reading the token means the backend is the only place the session
+// length is decided — change `expiresIn` there and this follows on its own.
+const FALLBACK_MAX_AGE_SECONDS = 900;
+
+// A token with under a minute left is not worth storing; the next refresh writes a fresh one.
+const MIN_MAX_AGE_SECONDS = 60;
+
+/** Seconds until this JWT expires, or null when it carries no readable `exp`. */
+function secondsUntilExpiry(token) {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return null;
+    const { exp } = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+    if (!exp) return null;
+    return exp - Math.floor(Date.now() / 1000);
+  } catch {
+    return null; // not a JWT we can read — fall back below
+  }
+}
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
@@ -33,11 +49,15 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:400
  * not configured (signPretaJwt returns null without PRETA_PRIVATE_KEY) must not wipe a
  * context that is still good. Signing out is separate and explicit — clearPretaCookie().
  */
-export function setPretaCookie(token, maxAgeSeconds = MAX_AGE_SECONDS) {
+export function setPretaCookie(token, maxAgeSeconds) {
   if (!token) return;
+  const fromToken = secondsUntilExpiry(token);
+  const maxAge =
+    maxAgeSeconds ??
+    (fromToken === null ? FALLBACK_MAX_AGE_SECONDS : Math.max(MIN_MAX_AGE_SECONDS, fromToken));
   const secure = location.protocol === "https:" ? "; Secure" : "";
   document.cookie =
-    PRETA_COOKIE + "=" + token + "; Path=/; Max-Age=" + maxAgeSeconds + "; SameSite=Lax" + secure;
+    PRETA_COOKIE + "=" + token + "; Path=/; Max-Age=" + maxAge + "; SameSite=Lax" + secure;
 }
 
 /**
