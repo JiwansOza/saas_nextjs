@@ -27,6 +27,13 @@ const REFRESH_MARGIN_SECONDS = 120;
 // A refresh that fails because the network blipped should be retried, but not in a hot loop.
 const RETRY_DELAY_SECONDS = 30;
 
+// Backup poll, independent of the single scheduled timer above. Background tabs get their
+// setTimeout throttled by the browser (sometimes far past its delay), which can let the
+// access token — and the Preta context cookie tied to it — expire before the real timer
+// ever fires. This interval is cheap and keeps running on its own throttled schedule, so
+// between it and the timer at least one of them wakes up in time to refresh.
+const LIVENESS_POLL_SECONDS = 30;
+
 export function getAccessToken() {
   try {
     return localStorage.getItem(ACCESS_TOKEN_KEY);
@@ -111,12 +118,29 @@ function endSessionLocally() {
 // it fires once per session lifetime and re-arms off whatever the refresh returned.
 
 let timer = null;
+let liveness = null;
+let refreshing = false;
 let started = false;
 
 function clearTimer() {
   if (timer !== null) {
     clearTimeout(timer);
     timer = null;
+  }
+}
+
+/** Runs the same "am I close to expiry" check as onVisible, on its own untied schedule. */
+async function checkLiveness() {
+  if (refreshing) return;
+  const token = getAccessToken();
+  if (!token || secondsLeft(token) > REFRESH_MARGIN_SECONDS) return;
+
+  refreshing = true;
+  try {
+    const ok = await refreshSession();
+    if (ok || getAccessToken()) scheduleNext(); // re-arm the primary timer either way
+  } finally {
+    refreshing = false;
   }
 }
 
@@ -163,6 +187,9 @@ export function startSession() {
   };
   document.addEventListener("visibilitychange", onVisible);
 
+  // Backup poll — see LIVENESS_POLL_SECONDS above. Runs whether or not the tab is visible.
+  liveness = setInterval(checkLiveness, LIVENESS_POLL_SECONDS * 1000);
+
   // A returning visitor has a refresh cookie but no access token in this tab, or a stale one.
   // Recover the session from the cookie before scheduling.
   const token = getAccessToken();
@@ -175,6 +202,10 @@ export function startSession() {
   return () => {
     started = false;
     clearTimer();
+    if (liveness !== null) {
+      clearInterval(liveness);
+      liveness = null;
+    }
     document.removeEventListener("visibilitychange", onVisible);
   };
 }
@@ -194,6 +225,10 @@ export async function endSession() {
     // Backend unreachable. Still clear locally — the visitor asked to be signed out.
   }
   clearTimer();
+  if (liveness !== null) {
+    clearInterval(liveness);
+    liveness = null;
+  }
   started = false;
   endSessionLocally();
 }
