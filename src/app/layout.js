@@ -70,9 +70,9 @@ export default async function RootLayout({ children }) {
         {/* Preta boot loader — context via window var (data-ctx-var), same as the v2
             loader above. The app already signs window.__PRETA_CTX__ server-side, so there
             is no /api/preta-token fetch (that route doesn't exist → was returning 404). */}
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
           src="https://loader-v1.pretasystems.com/boot?d=saas-nextjs-flax.vercel.app"
+          async
           data-api="https://app.pretasystems.com/v1/api"
           data-ctx-var="__PRETA_CTX__"
         ></script>
