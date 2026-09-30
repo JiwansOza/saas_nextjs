@@ -1,8 +1,13 @@
-// Signs a short-lived Preta context JWT server-side (RS256) so the loader can read it
-// synchronously from window.__PRETA_CTX__ (data-ctx-var) — NO client fetch to the
-// onrender backend, so the expiring saasify_access_token can never cause a 401 that
-// hides the personalized element. Preta verifies the token with the matching PUBLIC key
-// registered for this SaaSify company in the dashboard (Sign the context JWT → paste key).
+// UNUSED as of the switch to cookie delivery (data-ctx-cookie). Kept for reference only.
+//
+// This signed the context JWT inside Next.js so RootLayout could print it into
+// window.__PRETA_CTX__ (data-ctx-var). That is no longer how the token reaches the browser:
+// our own backend already signs it and returns it as `preta_token` from /auth/login,
+// /auth/signup and /users/preta-token (saas-backend/src/routes/auth.js, users.js), and
+// src/lib/preta-cookie.js writes that into the `preta_ctx` cookie.
+//
+// Keeping a second signer here would mean PRETA_PRIVATE_KEY living in two places for no
+// benefit. Delete this file once you are sure nothing else imports it.
 import { SignJWT, importPKCS8 } from "jose";
 
 // PEM may be stored raw (with BEGIN header, \n escaped) or base64 in the env.

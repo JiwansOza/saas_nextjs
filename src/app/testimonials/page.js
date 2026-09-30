@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Quote, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PretaTestBlock from "@/components/PretaTestBlock";
 
 const testimonials = [
   {
@@ -60,6 +61,10 @@ export default function TestimonialsPage() {
           Hear from our happy customers who have transformed their businesses
           with our SaaS platform.
         </p>
+      </div>
+
+      <div className="w-full max-w-6xl mt-12">
+        <PretaTestBlock />
       </div>
 
       <div className="grid md:grid-cols-3 gap-6 mt-12 w-full max-w-6xl">

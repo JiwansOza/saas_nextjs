@@ -4,11 +4,13 @@ import React from "react";
 
 import { Button } from "@/components/ui/button";
 import PricingSection from "@/components/PricingSection";
+import PretaTestBlock from "@/components/PretaTestBlock";
 
 const Page = () => {
   return (
     <>
       <PricingSection />
+      <PretaTestBlock />
       <div className="text-center max-w-2xl mx-auto my-5">
         <h3 className="text-2xl font-bold mb-4">Have Questions?</h3>
         <p className="text-muted-foreground mb-6">
