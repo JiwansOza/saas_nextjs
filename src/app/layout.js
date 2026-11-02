@@ -77,7 +77,7 @@ export default function RootLayout({ children }) {
             socket goes unused and the handshake is paid anyway. That was live on this page and
             cost the whole benefit: tcp=150 ms, tls=81 ms with the preconnect present, 0 ms once
             the attribute was removed. */}
-        <link rel="preconnect" href="https://loader-v1.pretasystems.com" />
+        <link rel="preconnect" href="https://loader-v2.pretasystems.com" />
         {/* TWO TAGS, NOT /boot. This is the change that closed the first-load gap.
 
             /boot was one small script whose entire job was to NAME these two URLs and stamp a
@@ -103,10 +103,10 @@ export default function RootLayout({ children }) {
             the loader would fall back to the default API host and every visitor would look
             anonymous. */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script src="https://loader-v1.pretasystems.com/config?d=saas-nextjs-flax.vercel.app"></script>
+        <script src="https://loader-v2.pretasystems.com/config?d=saas-nextjs-flax.vercel.app"></script>
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
-          src="https://loader-v1.pretasystems.com/l/pretaloader.js?d=saas-nextjs-flax.vercel.app"
+          src="https://loader-v2.pretasystems.com/l/pretaloader.js?d=saas-nextjs-flax.vercel.app"
           data-api="https://app.pretasystems.com/v2/api"
           data-ctx-cookie="preta_ctx"
           data-debug="true"
