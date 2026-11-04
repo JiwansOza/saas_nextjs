@@ -1,6 +1,10 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
 import ClientShell from "@/components/ClientShell";
+
+// GA4 test property "clother-app" — feeds the v2 AI-insights pull (GA Data API) during testing.
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-HSD4RXE8DL";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -144,6 +148,19 @@ export default function RootLayout({ children }) {
         <div id="__next">
           <ClientShell>{children}</ClientShell>
         </div>
+        {/* GA4 loads afterInteractive, so it never sits in front of the Preta tags above.
+            App Router route changes are counted by GA4's enhanced measurement (history
+            events), so no manual page_view calls are needed. */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_ID}');`}
+        </Script>
       </body>
     </html>
   );
