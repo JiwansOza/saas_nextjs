@@ -9,6 +9,7 @@ import { useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { applySession } from "@/lib/session";
+import { track } from "@/lib/analytics";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
@@ -76,13 +77,18 @@ const BILLING_STATUSES = [
     e.preventDefault();
     setError("");
 
-    // Client-side validation
-    if (!form.name.trim())  return setError("Name is required");
-    if (!form.email.trim()) return setError("Email is required");
+    // Client-side validation. Each failure is also a GA4 `sign_up_error`, so the funnel shows
+    // which rule turns visitors away.
+    const invalid = (reason, message) => {
+      track("sign_up_error", { reason, plan: form.plan });
+      setError(message);
+    };
+    if (!form.name.trim())  return invalid("name_missing", "Name is required");
+    if (!form.email.trim()) return invalid("email_missing", "Email is required");
     if (form.password.length < 8)
-      return setError("Password must be at least 8 characters");
+      return invalid("password_short", "Password must be at least 8 characters");
     if (form.password !== form.confirm_password)
-      return setError("Passwords do not match");
+      return invalid("password_mismatch", "Passwords do not match");
 
     setLoading(true);
     try {
@@ -105,8 +111,11 @@ const BILLING_STATUSES = [
 
       if (!res.ok) {
         setError(data.error || "Registration failed");
+        track("sign_up_error", { reason: res.status === 409 ? "email_taken" : `http_${res.status}`, plan: form.plan });
         return;
       }
+
+      track("sign_up", { method: "email", plan: data.user?.plan || form.plan, role: form.role || "none" });
 
       // Access token + Preta context in one place. The context must land BEFORE the
       // redirect below, or the first signed-in page renders with no context and the

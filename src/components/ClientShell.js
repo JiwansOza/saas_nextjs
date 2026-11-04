@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { startSession } from "@/lib/session";
+import { trackButtonClicks } from "@/lib/analytics";
 
 export default function ClientShell({ children }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -24,6 +25,9 @@ export default function ClientShell({ children }) {
   // backend hands both back from /auth/refresh, so renewing the session renews the context.
   // The schedule lives in lib/session.js and is armed from the token's own expiry.
   useEffect(() => startSession(), []);
+
+  // GA4: CTA clicks site-wide (see lib/analytics.js).
+  useEffect(() => trackButtonClicks(), []);
 
   return (
     <ThemeProvider

@@ -9,6 +9,7 @@ import { useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { applySession } from "@/lib/session";
+import { track } from "@/lib/analytics";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
@@ -48,8 +49,11 @@ export default function LoginPage() {
 
       if (!res.ok) {
         setError(data.error || "Login failed");
+        track("login_error", { reason: res.status === 401 ? "bad_credentials" : `http_${res.status}` });
         return;
       }
+
+      track("login", { method: "email", plan: data.user?.plan });
 
       // Access token + Preta context in one place. The context must land BEFORE the
       // redirect below, or the first signed-in page renders with no context and the
