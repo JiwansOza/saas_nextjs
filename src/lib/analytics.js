@@ -8,14 +8,16 @@ export function track(name, params = {}) {
 }
 
 /**
- * One delegated listener for every non-submit <button>: logs `cta_click` with its label and page.
+ * One delegated listener for every <button> that isn't a form submit: logs `cta_click` with its label and page.
  * Several CTAs on this site ("Start Free Trial", plan buttons, "Book a Demo") have no action yet —
  * this is what lets the data show visitors clicking them and going nowhere.
  */
 export function trackButtonClicks() {
   const onClick = (e) => {
     const btn = e.target instanceof Element ? e.target.closest("button") : null;
-    if (!btn || btn.type === "submit") return;
+    // A <button> with no type attribute is type "submit" even outside a form, so only skip real
+    // form submits (those are tracked as sign_up / login instead).
+    if (!btn || (btn.type === "submit" && btn.form)) return;
     const text = (btn.innerText || btn.getAttribute("aria-label") || "").trim().replace(/\s+/g, " ").slice(0, 60);
     if (!text) return;
     track("cta_click", { cta_text: text, page_path: window.location.pathname });
