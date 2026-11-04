@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { motion } from "framer-motion";
 import { Badge } from "./ui/badge";
@@ -5,8 +6,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Card, CardContent } from "./ui/card";
 import { Check } from "lucide-react";
 import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
+
+// Pricing tiers → the plan values the signup form / backend know (Free | Pro | Enterprise).
+const SIGNUP_PLAN = { Starter: "Free", Professional: "Pro", Enterprise: "Enterprise" };
+const planHref = (plan) =>
+  plan.cta === "Contact Sales" ? "/contact-us?topic=enterprise" : `/signup?plan=${SIGNUP_PLAN[plan.name] || "Free"}`;
 
 const PricingSection = () => {
+  const router = useRouter();
   return (
     <section
       id="pricing"
@@ -140,6 +148,7 @@ const PricingSection = () => {
                           ))}
                         </ul>
                         <Button
+                          onClick={() => router.push(planHref(plan))}
                           className={`w-full mt-auto rounded-full text-base py-5 cursor-pointer ${
                             plan.popular
                               ? "bg-primary hover:bg-primary/90"
@@ -240,6 +249,7 @@ const PricingSection = () => {
                           ))}
                         </ul>
                         <Button
+                          onClick={() => router.push(planHref(plan))}
                           className={`w-full mt-auto rounded-full ${
                             plan.popular
                               ? "bg-primary hover:bg-primary/90"

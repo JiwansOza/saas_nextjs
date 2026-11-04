@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { applySession } from "@/lib/session";
@@ -58,6 +58,14 @@ const BILLING_STATUSES = [
   });
   const [error, setError]     = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Arriving from a pricing button (/signup?plan=Pro): start with that plan chosen. Read after
+  // mount, not in the initial state, so the server-rendered form and the first client render match.
+  useEffect(() => {
+    const plan = new URLSearchParams(window.location.search).get("plan");
+    if (!plan || !PLAN_FEATURES[plan]) return;
+    setForm((f) => ({ ...f, plan, features: PLAN_FEATURES[plan], billing_status: plan === "Free" ? "never" : "trial" }));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
@@ -138,7 +146,7 @@ const BILLING_STATUSES = [
 
       window.location.href = "/";
     } catch (err) {
-      setError("Could not reach server. Make sure the backend is running.");
+      setError("We couldn’t reach our servers. Check your connection and try again.");
     } finally {
       setLoading(false);
     }

@@ -76,7 +76,7 @@ export default function LoginPage() {
 
       window.location.href = "/";
     } catch {
-      setError("Could not reach server. Make sure the backend is running.");
+      setError("We couldn’t reach our servers. Check your connection and try again.");
     } finally {
       setLoading(false);
     }

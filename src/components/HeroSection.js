@@ -6,8 +6,10 @@ import { ArrowRight } from "lucide-react";
 import { Check } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const HeroSection = () => {
+  const router = useRouter();
   return (
     <section className="w-full py-20  overflow-hidden">
       <div className="px-4 md:px-6 relative py-5">
@@ -37,6 +39,7 @@ const HeroSection = () => {
             <Button
               size="lg"
               className="rounded-full h-12 px-8 text-base cursor-pointer group"
+              onClick={() => router.push("/signup")}
             >
               Start Free Trial
               <ArrowRight className="group-hover:translate-x-1 transition-all ease-in-out duration-200 size-4" />
@@ -45,6 +48,7 @@ const HeroSection = () => {
               size="lg"
               variant="outline"
               className="rounded-full h-12 px-8 text-base cursor-pointer"
+              onClick={() => router.push("/contact-us?topic=demo")}
             >
               Book a Demo
             </Button>

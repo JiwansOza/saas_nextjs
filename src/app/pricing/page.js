@@ -5,8 +5,10 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import PricingSection from "@/components/PricingSection";
 import PretaTestBlock from "@/components/PretaTestBlock";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
+  const router = useRouter();
   return (
     <>
       <PricingSection />
@@ -17,7 +19,7 @@ const Page = () => {
           Contact our team for custom solutions or any inquiries about pricing
           plans.
         </p>
-        <Button variant="default" className={"cursor-pointer"}>
+        <Button variant="default" className={"cursor-pointer"} onClick={() => router.push("/contact-us")}>
           Contact Us
         </Button>
       </div>

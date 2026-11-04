@@ -1,9 +1,12 @@
+"use client";
 import React from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { ArrowRight } from "lucide-react";
 
 const CTASection = () => {
+  const router = useRouter();
   return (
     <section className="w-full py-20 md:py-32 bg-gradient-to-br from-primary to-primary/80 dark:from-gray-100 dark:to-gray-500 text-primary-foreground relative overflow-hidden">
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
@@ -30,6 +33,7 @@ const CTASection = () => {
               size="lg"
               variant="secondary"
               className="rounded-full h-12 px-8 text-base cursor-pointer group"
+              onClick={() => router.push("/signup")}
             >
               Start Free Trial
               <ArrowRight
@@ -38,6 +42,7 @@ const CTASection = () => {
               />
             </Button>
             <Button
+              onClick={() => router.push("/contact-us?topic=demo")}
               size="lg"
               variant="outline"
               className="rounded-full h-12 px-8 text-base bg-transparent border-white text-white hover:text-white hover:bg-white/10 cursor-pointer dark:text-neutral-700 dark:bg-white dark:hover:bg-gray-100"

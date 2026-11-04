@@ -6,6 +6,14 @@ import ClientShell from "@/components/ClientShell";
 // GA4 test property "clother-app" — feeds the v2 AI-insights pull (GA Data API) during testing.
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-HSD4RXE8DL";
 
+// Every page gets a real <title> ("Pricing | SaaSify"); routes set their own in their layout.js.
+// Without titles, GA4 and search results showed every page unnamed.
+export const metadata = {
+  metadataBase: new URL("https://saas-nextjs-flax.vercel.app"),
+  title: { default: "SaaSify — All-in-one platform to run and scale your SaaS", template: "%s | SaaSify" },
+  description: "Streamline your workflow with analytics, automation and security in one SaaS platform. Start a 14-day free trial.",
+};
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
