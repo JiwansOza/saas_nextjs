@@ -9,7 +9,7 @@ import { useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { applySession } from "@/lib/session";
-import { track } from "@/lib/analytics";
+import { track, trackThen } from "@/lib/analytics";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
@@ -53,7 +53,6 @@ export default function LoginPage() {
         return;
       }
 
-      track("login", { method: "email", plan: data.user?.plan });
 
       // Access token + Preta context in one place. The context must land BEFORE the
       // redirect below, or the first signed-in page renders with no context and the
@@ -74,7 +73,10 @@ export default function LoginPage() {
         },
       });
 
-      window.location.href = "/";
+      // Redirect only once GA has the login (max 1 s), or the event is lost with the page.
+      trackThen("login", { method: "email", plan: data.user?.plan }, () => {
+        window.location.href = "/";
+      });
     } catch {
       setError("We couldn’t reach our servers. Check your connection and try again.");
     } finally {

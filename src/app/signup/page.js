@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { applySession } from "@/lib/session";
-import { track } from "@/lib/analytics";
+import { track, trackThen } from "@/lib/analytics";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
@@ -123,7 +123,6 @@ const BILLING_STATUSES = [
         return;
       }
 
-      track("sign_up", { method: "email", plan: data.user?.plan || form.plan, role: form.role || "none" });
 
       // Access token + Preta context in one place. The context must land BEFORE the
       // redirect below, or the first signed-in page renders with no context and the
@@ -144,7 +143,10 @@ const BILLING_STATUSES = [
         },
       });
 
-      window.location.href = "/";
+      // Redirect only once GA has the sign_up (max 1 s) — straight away, the page unloads first and it is lost.
+      trackThen("sign_up", { method: "email", plan: data.user?.plan || form.plan, role: form.role || "none" }, () => {
+        window.location.href = "/";
+      });
     } catch (err) {
       setError("We couldn’t reach our servers. Check your connection and try again.");
     } finally {
