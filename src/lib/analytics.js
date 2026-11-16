@@ -1,4 +1,4 @@
-// Funnel events for this test site, sent to GA4 (tag in app/layout.js), PostHog, Mixpanel and Amplitude
+// Funnel events for this test site, sent to GA4 and Plausible (tags in app/layout.js), PostHog, Mixpanel and Amplitude
 // (instrumentation-client.js). Page views are automatic in both; these are the moments a funnel
 // needs: sign-ups, logins, form errors and CTA clicks. The Preta v2 AI-insights trial reads them
 // back from each tool to find where visitors drop off.
@@ -8,6 +8,14 @@ import * as amplitude from "@amplitude/analytics-browser";
 
 const mixpanelReady = () => !!mixpanel.__loaded;
 
+/** Plausible custom event; props must be flat strings/numbers. A no-op until the tag stub exists. */
+function plausibleEvent(name, params) {
+  if (typeof window.plausible !== "function") return;
+  const props = {};
+  for (const [k, v] of Object.entries(params || {})) if (v != null && typeof v !== "object") props[k] = String(v).slice(0, 300);
+  window.plausible(name, { props });
+}
+
 export function track(name, params = {}) {
   if (typeof window === "undefined") return;
   if (typeof window.gtag === "function") window.gtag("event", name, params);
@@ -15,6 +23,7 @@ export function track(name, params = {}) {
   if (posthog.__loaded) posthog.capture(name, params);
   if (mixpanelReady()) mixpanel.track(name, params);
   amplitude.track(name, params); // the SDK queues calls made before init
+  plausibleEvent(name, params);
 }
 
 /**
@@ -39,6 +48,7 @@ export function trackThen(name, params, next, timeoutMs = 1000) {
   amplitude.setTransport("beacon");
   amplitude.track(name, params);
   amplitude.flush();
+  plausibleEvent(name, params); // Plausible sends with fetch keepalive, which survives the redirect
   if (typeof window.gtag !== "function") return go();
   window.gtag("event", name, { ...params, event_callback: go, event_timeout: timeoutMs });
   setTimeout(go, timeoutMs + 200); // belt and braces: event_callback never fires if gtag.js failed to load
