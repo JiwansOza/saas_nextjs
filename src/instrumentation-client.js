@@ -1,4 +1,4 @@
-// PostHog and Mixpanel for this test site, next to GA4 (app/layout.js). Runs before the app hydrates — Next.js's
+// PostHog, Mixpanel and Amplitude for this test site, next to GA4 (app/layout.js). Runs before the app hydrates — Next.js's
 // own hook for client-side setup (15.3+). The Preta v2 AI-insights trial reads PostHog back through
 // its query API and Mixpanel through its raw event export, the same way it reads GA4.
 //
@@ -6,6 +6,7 @@
 // autocapture; the site's own funnel events are sent by lib/analytics.js.
 import posthog from "posthog-js";
 import mixpanel from "mixpanel-browser";
+import * as amplitude from "@amplitude/analytics-browser";
 
 const POSTHOG_KEY =
   process.env.NEXT_PUBLIC_POSTHOG_KEY || "phc_nrybRQUNrZJpKXSmryDptamjcS6VgKVCNgQLUqTwaXw8";
@@ -22,4 +23,20 @@ const MIXPANEL_TOKEN = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN || "f7de08077bdbdb
 mixpanel.init(MIXPANEL_TOKEN, {
   autocapture: { pageview: "full-url", click: true, input: false, scroll: false, submit: true },
   persistence: "localStorage",
+});
+
+// Amplitude (project PretaSaas, US data). Autocapture sends page views on every route change
+// ([Amplitude] Page Viewed), button/link clicks ([Amplitude] Element Clicked), rage and dead
+// clicks, sessions and UTM attribution. The API key is public — it is in the page anyway.
+const AMPLITUDE_KEY = process.env.NEXT_PUBLIC_AMPLITUDE_KEY || "031aeaf73784ca85c43a96929d73ce7e";
+
+amplitude.init(AMPLITUDE_KEY, {
+  autocapture: {
+    pageViews: { trackHistoryChanges: "all" },
+    elementInteractions: true,
+    frustrationInteractions: true,
+    sessions: true,
+    attribution: true,
+    formInteractions: true,
+  },
 });

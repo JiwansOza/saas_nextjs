@@ -1,9 +1,10 @@
-// Funnel events for this test site, sent to GA4 (tag in app/layout.js), PostHog and Mixpanel
+// Funnel events for this test site, sent to GA4 (tag in app/layout.js), PostHog, Mixpanel and Amplitude
 // (instrumentation-client.js). Page views are automatic in both; these are the moments a funnel
 // needs: sign-ups, logins, form errors and CTA clicks. The Preta v2 AI-insights trial reads them
 // back from each tool to find where visitors drop off.
 import posthog from "posthog-js";
 import mixpanel from "mixpanel-browser";
+import * as amplitude from "@amplitude/analytics-browser";
 
 const mixpanelReady = () => !!mixpanel.__loaded;
 
@@ -13,6 +14,7 @@ export function track(name, params = {}) {
   // PostHog keeps its own copy; it batches and flushes on page hide like GA.
   if (posthog.__loaded) posthog.capture(name, params);
   if (mixpanelReady()) mixpanel.track(name, params);
+  amplitude.track(name, params); // the SDK queues calls made before init
 }
 
 /**
@@ -32,6 +34,11 @@ export function trackThen(name, params, next, timeoutMs = 1000) {
   // PostHog sends this with sendBeacon on unload, so it survives the redirect without waiting.
   if (posthog.__loaded) posthog.capture(name, params, { transport: "sendBeacon" });
   if (mixpanelReady()) mixpanel.track(name, params, { transport: "sendBeacon" });
+  // Amplitude batches and sends asynchronously; switch to sendBeacon (the page is about to be
+  // replaced by the redirect, so it isn't switched back) so this event survives the unload.
+  amplitude.setTransport("beacon");
+  amplitude.track(name, params);
+  amplitude.flush();
   if (typeof window.gtag !== "function") return go();
   window.gtag("event", name, { ...params, event_callback: go, event_timeout: timeoutMs });
   setTimeout(go, timeoutMs + 200); // belt and braces: event_callback never fires if gtag.js failed to load
