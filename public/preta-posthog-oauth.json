@@ -3,11 +3,15 @@
   "client_name": "Preta AI Insights (test)",
   "redirect_uris": [
     "http://127.0.0.1:8765/callback",
-    "http://localhost:3000/v2/api/creator/integrations/posthog/callback"
+    "http://localhost:3000/v2/api/creator/integrations/posthog/callback",
+    "https://app.pretasystems.com/v2/api/creator/integrations/posthog/callback"
   ],
   "token_endpoint_auth_method": "none",
   "com.posthog": {
-    "scopes": ["query:read", "project:read"],
+    "scopes": [
+      "query:read",
+      "project:read"
+    ],
     "optional_scopes": []
   }
 }
