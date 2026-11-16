@@ -169,15 +169,6 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', '${GA_ID}');`}
         </Script>
-        {/* Plausible (site saas-nextjs-flax.vercel.app), the fifth analytics tool the Preta v2
-            AI-insights trial reads (Stats API). Its script counts page views on client-side route
-            changes by itself; sign_up / login / cta_click go through lib/analytics.js and are
-            Goals in Plausible. The stub queues calls made before the script has loaded. */}
-        <Script src="https://plausible.io/js/pa-0dKzum8nnnf7RwjSbwhag.js" strategy="afterInteractive" />
-        <Script id="plausible-init" strategy="afterInteractive">
-          {`window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-plausible.init()`}
-        </Script>
       </body>
     </html>
   );
