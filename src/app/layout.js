@@ -119,7 +119,7 @@ export default function RootLayout({ children }) {
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
           src="https://loader-v2.pretasystems.com/l/pretaloader.js?d=saas-nextjs-flax.vercel.app"
-          data-api="https://app.pretasystems.com/v4/api"
+          data-api="https://app.pretasystems.com/v2/api"
           data-ctx-cookie="preta_ctx"
           data-debug="true"
         ></script>
